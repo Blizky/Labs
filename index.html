@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>RetroCut – Offline editor + background removal by Blizlab</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="icon" type="image/svg+xml" href="/assets/svg/fabicon.svg">
+  <link rel="stylesheet" href="/assets/css/global.css">
+  <script src="/assets/components.js" defer></script>
+
+  <link rel="stylesheet" href="imagestudio.css">
+</head>
+
+<body>
+  <app-header layout="compact" app-title="RetroCut"></app-header>
+
+  <main class="page-main">
+    <div class="app-layout imagestudio-main">
+      <aside class="side-panel">
+          <div class="card sidebar">
+            <div class="mode-tabs" role="tablist" aria-label="Tool mode">
+              <button class="mode-tab active" data-mode="layers" role="tab" aria-selected="true">
+                <img src="/RetroCut/svg/layer_line.svg" alt="" width="16" height="16">
+                <span>Layers</span>
+              </button>
+              <button class="mode-tab" data-mode="edit" role="tab" aria-selected="false">
+                <img src="/RetroCut/svg/pic_ai_line.svg" alt="" width="16" height="16">
+                <span>Retro</span>
+              </button>
+              <button class="mode-tab" data-mode="cutout" role="tab" aria-selected="false" hidden>
+                <img class="bgone-tab-icon" src="/RetroCut/svg/bgone.svg" alt="" width="18" height="18">
+                <span>BGone</span>
+              </button>
+            </div>
+
+            <div class="controls-group">
+              <div class="sidebar-section-title">IMAGE</div>
+
+              <div class="actions-inline">
+                <label class="file-button">
+                  <input type="file" id="fileInput" accept="image/*" />
+                  <img src="/RetroCut/svg/upload_2_line.svg" alt="" width="16" height="16">
+                  <span>Image</span>
+                </label>
+                <button class="file-button" id="pasteImageBtn" type="button" aria-label="Paste image from clipboard" title="Paste image from clipboard">
+                  <img src="/RetroCut/svg/paster_line.svg" alt="" width="16" height="16">
+                </button>
+                <button class="main" id="downloadEditorBtn" disabled>
+                  <img src="/RetroCut/svg/download_2_line.svg" alt="" width="16" height="16">
+                  <span>Download</span>
+                </button>
+              </div>
+              <div class="file-name" id="fileNameText">No file selected.</div>
+              <div class="handoff-row">
+                <button class="secondary-btn" id="btnAddCompositionLayer" disabled>
+                  <span>Add composition as new layer</span>
+                  <img src="/RetroCut/svg/arrow_right_line.svg" alt="" width="14" height="14">
+                </button>
+              </div>
+              <div class="export-inline-wrap" id="exportMenuWrap">
+                <div class="export-inline-actions">
+                  <button class="secondary-btn export-inline-btn export-primary-btn" id="btnImportLayersComposition" data-export-mode="edit" disabled>
+                    <span>Import Layers Composition</span>
+                    <img class="export-arrow export-arrow-left" src="/RetroCut/svg/arrow_right_line.svg" alt="" width="14" height="14">
+                  </button>
+                  <button class="secondary-btn export-inline-btn export-primary-btn" id="sendToLayersBtn" data-export-mode="edit" disabled>
+                    <span>Export to new Layer</span>
+                    <img class="export-arrow" src="/RetroCut/svg/arrow_right_line.svg" alt="" width="14" height="14">
+                  </button>
+                  <button class="secondary-btn export-inline-btn" id="btnApplyCutout" data-export-mode="cutout" disabled>Retro</button>
+                  <button class="secondary-btn export-inline-btn" id="btnSendCutoutToLayers" data-export-mode="cutout" disabled>Layers</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="editPanel">
+              <div class="controls-group">
+                <div class="sidebar-section-title">CANVAS</div>
+                <div class="chips" id="orientationChips">
+                  <button class="chip-btn active" data-orientation="landscape43"><span>4:3</span></button>
+                  <button class="chip-btn" data-orientation="landscape169"><span>16:9</span></button>
+                  <button class="chip-btn" data-orientation="portrait34"><span>3:4</span></button>
+                  <button class="chip-btn" data-orientation="square11"><span>Square</span></button>
+                </div>
+              </div>
+
+              <div class="controls-group">
+                <div class="sidebar-section-title">STYLE</div>
+                <div class="chips" id="styleChips">
+                  <button class="chip-btn active" data-style="bw"><span class="style-dot bw"></span><span>B&amp;W</span></button>
+                  <button class="chip-btn" data-style="sepia"><span class="style-dot sepia"></span><span>Sepia</span></button>
+                  <button class="chip-btn" data-style="postal"><span class="style-dot postal"></span><span>Postcard</span></button>
+                </div>
+              </div>
+
+              <div class="controls-group">
+                <div class="slider-group">
+                  <label for="intensity">Style intensity</label>
+                  <div class="slider-row">
+                    <input type="range" id="intensity" min="0" max="100" value="50" />
+                    <span id="intensityValue">50</span>
+                  </div>
+                </div>
+
+                <div class="slider-group">
+                  <label for="roundness">Rounded corners</label>
+                  <div class="slider-row">
+                    <input type="range" id="roundness" min="0" max="80" value="0" />
+                    <span id="roundnessValue">0</span>
+                  </div>
+                </div>
+
+                <div class="slider-group">
+                  <label for="noise">Film grain</label>
+                  <div class="slider-row">
+                    <input type="range" id="noise" min="0" max="100" value="15" />
+                    <span id="noiseValue">15</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="controls-group">
+                <div class="sidebar-section-title">ADJUSTMENTS</div>
+                <div class="adjustment-actions">
+                  <button class="secondary-btn" id="fillBtn">Fill</button>
+                  <button class="secondary-btn" id="resetEditBtn" disabled>Reset</button>
+                </div>
+              </div>
+            </div>
+
+            <div id="cutoutPanel" hidden>
+              <div class="controls-group">
+                <div class="sidebar-section-title">BACKGROUND</div>
+                <button class="primary-btn full-width-btn" id="btnRemove" disabled>Cutout</button>
+                <button class="secondary-btn full-width-btn chroma-btn" id="btnRemoveChroma" disabled>Remove chroma key</button>
+                <div class="brush-label-row ai-strength-row">
+                  <span>Border</span>
+                  <span class="brush-value" id="aiStrengthValue">60</span>
+                </div>
+                <input id="aiStrength" type="range" min="0" max="100" value="60" />
+              </div>
+
+              <div class="controls-group">
+                <div class="sidebar-section-title">BRUSH</div>
+                <div class="brush-label-row">
+                  <span>Brush size</span>
+                  <span class="brush-value" id="brushValue">28</span>
+                </div>
+                <input id="brushSize" type="range" min="5" max="120" value="28" />
+
+                <div class="pill-toggle" role="tablist" aria-label="Brush mode">
+                  <button id="modeErase" class="active" data-mode="erase" role="tab" aria-selected="true">Erase</button>
+                  <button id="modeRestore" data-mode="restore" role="tab" aria-selected="false">Restore</button>
+                </div>
+
+                <div class="pill-toggle view-mode-toggle" role="tablist" aria-label="View mode">
+                  <button id="viewModeBrush" class="active" data-view-mode="brush" role="tab" aria-selected="true">Brush</button>
+                  <button id="viewModeMove" data-view-mode="move" role="tab" aria-selected="false">Move</button>
+                </div>
+
+                <div class="undo-redo-row">
+                  <button class="secondary-btn" id="btnUndo" disabled>Undo</button>
+                  <button class="secondary-btn" id="btnRedo" disabled>Redo</button>
+                </div>
+
+              </div>
+
+              <div class="controls-group">
+                <div class="sidebar-section-title">ADJUSTMENTS</div>
+                <div class="adjustment-actions">
+                  <button class="secondary-btn" id="btnResetCutout" disabled>Reset</button>
+                  <div class="cutout-bg-switch cutout-bg-switch-inline" role="group" aria-label="Background preview">
+                    <button class="cutout-bg-btn active" data-cutout-bg="checker" type="button" title="Checker background" aria-label="Checker background"></button>
+                    <button class="cutout-bg-btn" data-cutout-bg="white" type="button" title="White background" aria-label="White background"></button>
+                    <button class="cutout-bg-btn" data-cutout-bg="black" type="button" title="Black background" aria-label="Black background"></button>
+                    <button class="cutout-bg-btn cutout-bg-context-btn" data-cutout-bg="context" type="button" title="Layer context background" aria-label="Layer context background" hidden>Ctx</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="layersPanel" hidden>
+              <div class="controls-group">
+                <div class="sidebar-section-title">CANVAS</div>
+                <div class="chips" id="layersRatioChips">
+                  <button class="chip-btn" data-ratio="square"><span>Square</span></button>
+                  <button class="chip-btn active" data-ratio="landscape43"><span>4:3</span></button>
+                  <button class="chip-btn" data-ratio="landscape169"><span>16:9</span></button>
+                  <button class="chip-btn" data-ratio="portrait34"><span>3:4</span></button>
+                </div>
+              </div>
+
+              <div class="controls-group">
+                <div class="sidebar-section-title">EXPORT</div>
+                <div class="handoff-row">
+                  <button class="secondary-btn" id="btnDownloadLayersZip" disabled>
+                    <img src="/RetroCut/svg/file_zip_line.svg" alt="" width="14" height="14">
+                    <span>Download Layers ZIP</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="controls-group">
+                <button class="parallax-toggle" id="btnParallaxToggle" type="button" aria-expanded="false" aria-controls="parallaxPanelBody">
+                  <span>PARALLAX</span>
+                  <img src="/RetroCut/svg/arrow_to_down_line.svg" alt="" width="14" height="14">
+                </button>
+                <div class="parallax-panel" id="parallaxPanelBody" hidden>
+                  <div class="parallax-controls">
+                    <label class="slider-group" for="parallaxDuration">
+                      <span>Duration</span>
+                      <div class="slider-row">
+                        <input type="range" id="parallaxDuration" min="1" max="5" step="1" value="3">
+                        <span id="parallaxDurationValue">3s</span>
+                      </div>
+                    </label>
+                    <label class="slider-group" for="parallaxIntensity">
+                      <span>Intensity</span>
+                      <div class="slider-row">
+                        <input type="range" id="parallaxIntensity" min="25" max="100" step="5" value="100">
+                        <span id="parallaxIntensityValue">100%</span>
+                      </div>
+                    </label>
+                    <label class="parallax-row" for="parallaxQualityPreset">
+                      <span>Quality</span>
+                      <select id="parallaxQualityPreset">
+                        <option value="100">100% · Video quality</option>
+                        <option value="50" selected>50% · Social media</option>
+                        <option value="30">30% · Chat sharing</option>
+                      </select>
+                    </label>
+                    <label class="parallax-row" for="parallaxFps">
+                      <span>FPS</span>
+                      <select id="parallaxFps">
+                        <option value="10">10</option>
+                        <option value="12" selected>12</option>
+                        <option value="15">15</option>
+                        <option value="20">20</option>
+                      </select>
+                    </label>
+                    <label class="parallax-row" for="parallaxLoopMode">
+                      <span>Loop</span>
+                      <select id="parallaxLoopMode">
+                        <option value="pingpong" selected>Ping-pong</option>
+                        <option value="linear">Linear</option>
+                      </select>
+                    </label>
+                    <label class="parallax-row" for="parallaxMotionType">
+                      <span>Motion</span>
+                      <select id="parallaxMotionType">
+                        <option value="zoom" selected>Zoom</option>
+                        <option value="panx">Pan Horizontally</option>
+                        <option value="pany">Pan Vertically</option>
+                      </select>
+                    </label>
+                  </div>
+                  <div class="handoff-row">
+                    <button class="secondary-btn" id="btnExportParallaxGif" disabled>
+                      <img src="/RetroCut/svg/film_line.svg" alt="" width="14" height="14">
+                      <span id="parallaxActionLabel">Create Parallax Animation</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+      </aside>
+
+      <section class="canvas-panel canvas-area">
+        <div class="canvas-stack">
+          <div class="canvas-drop-zone" id="editorDropZone">
+            <canvas id="editorCanvas"></canvas>
+            <div class="drop-hint">Drop an image here</div>
+          </div>
+
+          <div class="canvas-wrap" id="cutoutWrap" hidden>
+            <canvas id="cutoutCanvas"></canvas>
+            <div class="brush-preview" id="brushPreview"></div>
+            <div class="overlay-msg" id="overlayMsg">
+              Drop an image here, or use “Image” on the left.
+            </div>
+          </div>
+
+          <div class="layers-wrap" id="layersWrap" hidden>
+            <div class="layers-canvas-wrap" id="layersCanvasWrap">
+              <canvas id="layersCanvas"></canvas>
+            </div>
+            <aside class="layers-list-panel">
+              <div class="layers-panel-head">
+                <div class="sidebar-section-title">LAYERS</div>
+                <button class="layers-add-btn" id="btnLayersAdd" type="button" title="Add image layer" aria-label="Add image layer">+</button>
+              </div>
+              <div class="layers-list" id="layersList"></div>
+            </aside>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="model-bar-row">
+      <div class="model-bar" id="modelBarCanvas" hidden>
+        <span class="model-label">AI model</span>
+        <span class="model-note-text" id="modelNote">
+          U²-Net model downloads once and then works offline in this browser.
+        </span>
+        <button class="model-btn" id="btnReloadModel">Reload model</button>
+        <span class="model-dot" id="modelDot" aria-hidden="true"></span>
+      </div>
+    </div>
+  </main>
+
+  <div class="preview-overlay" id="parallaxPreviewOverlay" hidden>
+    <div class="preview-modal" role="dialog" aria-modal="true" aria-labelledby="parallaxPreviewTitle">
+      <div class="preview-head">
+        <h3 id="parallaxPreviewTitle">Parallax Animation</h3>
+      </div>
+      <div class="preview-body">
+        <img id="parallaxPreviewImage" alt="Parallax animation preview">
+      </div>
+      <div class="preview-actions">
+        <button class="secondary-btn" id="btnSaveParallaxGif" type="button">Save GIF</button>
+        <button class="secondary-btn" id="btnCloseParallaxPreview" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <app-footer></app-footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gif.js.optimized/dist/gif.js"></script>
+  <script type="module" src="imagestudio.js"></script>
+</body>
+</html>
