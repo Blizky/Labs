@@ -1,0 +1,155 @@
+/* ----------------------------------------------------------
+   CHRONO STYLES
+---------------------------------------------------------- */
+
+body {
+  background: #fdfdf9;
+}
+
+.page-main {
+  max-width: 980px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 42px 20px 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.chrono-shell {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.tool-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.tool-header .app-brand-text {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+/* ----------------------------------------------------------
+   TIMER DISPLAY
+---------------------------------------------------------- */
+.chrono-display {
+  background: #f4f8fb;
+  border-radius: 16px;
+  padding: 24px 0;
+  margin-bottom: 24px;
+  border: 2px solid #e1e8ed;
+  
+  font-family: "Courier New", Courier, monospace;
+  font-size: 4rem;
+  font-weight: 700;
+  color: #333;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  text-align: center; /* Numbers still look best centered in their box */
+}
+
+/* ----------------------------------------------------------
+   BUTTONS
+---------------------------------------------------------- */
+.btn-main {
+  width: 100%;
+  padding: 16px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: white;
+  outline: none;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.btn-main:active {
+  transform: scale(0.98);
+}
+
+.btn-secondary {
+  width: 100%;
+  margin-top: 10px;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  border: 1px solid rgba(0, 0, 0, 0.16);
+  border-radius: 12px;
+  background: #f4fbff;
+  color: #115a74;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: #e2f3ff;
+}
+
+footer {
+  background: linear-gradient(180deg, #0a90bc 0%, #0a6a8c 100%);
+  border-top: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+/* State Colors */
+.btn-play {
+  background-color: #2ecc71; 
+  box-shadow: 0 8px 20px rgba(46, 204, 113, 0.3);
+}
+.btn-play:hover {
+  background-color: #27ae60;
+}
+
+.btn-stop {
+  background-color: #ff506e; 
+  box-shadow: 0 8px 20px rgba(255, 80, 110, 0.3);
+}
+.btn-stop:hover {
+  background-color: #e63956;
+}
+
+.btn-reset {
+  background-color: #3498db; 
+  box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+}
+.btn-reset:hover {
+  background-color: #2980b9;
+}
+
+/* Mobile Tweak */
+@media (max-width: 500px) {
+  .chrono-display {
+    font-size: 3rem;
+  }
+}
+
+body.popup-mode app-header,
+body.popup-mode app-footer,
+body.popup-mode .tool-header,
+body.popup-mode .btn-secondary {
+  display: none !important;
+}
+
+body.popup-mode {
+  background: #0f2b36;
+}
+
+body.popup-mode .page-main {
+  max-width: none;
+  padding: 12px;
+  min-height: 100vh;
+  justify-content: center;
+  align-items: stretch;
+}
+
+body.popup-mode .chrono-display {
+  font-size: 2.8rem;
+  margin-bottom: 12px;
+  padding: 16px 0;
+}

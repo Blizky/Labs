@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chrono – Simple One-Button Stopwatch</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="icon" type="image/svg+xml" href="/assets/svg/fabicon.svg">
+  <link rel="stylesheet" href="/assets/css/global.css">
+  <script src="/assets/components.js" defer></script>
+
+  <link rel="stylesheet" href="chrono.css">
+</head>
+
+<body>
+
+  <app-header layout="compact" app-title="Chrono"></app-header>
+
+  <main class="page-main">
+    <section class="chrono-shell">
+      <div class="chrono-container">
+        <div id="display" class="chrono-display">00:00:00</div>
+        <button id="actionBtn" class="btn-main btn-play">Start</button>
+        <button id="popoutBtn" class="btn-secondary" type="button">Pop Out</button>
+      </div>
+    </section>
+  </main>
+
+  <app-footer></app-footer>
+
+  <script>
+    (function() {
+      let startTime = 0;
+      let elapsedTime = 0;
+      let timerInterval = null;
+      let currentState = 'idle'; 
+
+      const display = document.getElementById("display");
+      const btn = document.getElementById("actionBtn");
+      const popoutBtn = document.getElementById("popoutBtn");
+      const isPopup = new URLSearchParams(window.location.search).get("popup") === "1";
+
+      if (isPopup) {
+        document.body.classList.add("popup-mode");
+      }
+
+      function updateDisplay(time) {
+        let diff = time;
+        let ms = Math.floor((diff % 1000) / 10);
+        let s = Math.floor((diff / 1000) % 60);
+        let m = Math.floor((diff / (1000 * 60)) % 60);
+
+        let mString = m < 10 ? "0" + m : m;
+        let sString = s < 10 ? "0" + s : s;
+        let msString = ms < 10 ? "0" + ms : ms;
+
+        if(display) {
+          display.textContent = `${mString}:${sString}:${msString}`;
+        }
+      }
+
+      function handleAction() {
+        if (currentState === 'idle') {
+          // START
+          startTime = Date.now() - elapsedTime;
+          timerInterval = setInterval(() => {
+            const now = Date.now();
+            elapsedTime = now - startTime;
+            updateDisplay(elapsedTime);
+          }, 10);
+
+          currentState = 'running';
+          btn.textContent = "Stop";
+          btn.className = "btn-main btn-stop";
+
+        } else if (currentState === 'running') {
+          // STOP
+          clearInterval(timerInterval);
+          currentState = 'stopped';
+          btn.textContent = "Reset";
+          btn.className = "btn-main btn-reset";
+
+        } else if (currentState === 'stopped') {
+          // RESET
+          elapsedTime = 0;
+          updateDisplay(0);
+          currentState = 'idle';
+          btn.textContent = "Start";
+          btn.className = "btn-main btn-play";
+        }
+      }
+
+      // Initialize
+      if (btn) {
+        btn.addEventListener("click", handleAction);
+      }
+
+      if (popoutBtn) {
+        popoutBtn.addEventListener("click", () => {
+          const popupUrl = new URL(window.location.href);
+          popupUrl.searchParams.set("popup", "1");
+
+          const popup = window.open(
+            popupUrl.toString(),
+            "chronoPopout",
+            "width=420,height=260,resizable=yes,scrollbars=no,toolbar=no,menubar=no,location=no,status=no"
+          );
+
+          if (popup) {
+            popup.opener = null;
+            popup.focus();
+          }
+        });
+      }
+    })();
+  </script>
+
+</body>
+</html>

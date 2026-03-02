@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>OctoFind – Multi-site media search</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="icon" type="image/svg+xml" href="/assets/svg/fabicon.svg">
+  <link rel="stylesheet" href="/assets/css/global.css">
+  <script src="/assets/components.js" defer></script>
+
+  <link rel="stylesheet" href="octofind.css"> 
+  
+</head>
+
+<body>
+
+  <app-header layout="compact" app-title="OctoFind"></app-header>
+
+  <main class="page-main">
+    <div class="popup-strip" id="popupStrip">
+      <div class="popup-strip-main">
+        <span class="icon">⚠️</span>
+        <span id="popupText">
+          To open multiple sites at once, please allow pop-ups for this page.
+        </span>
+      </div>
+      <button id="popupDismiss">Got it</button>
+    </div>
+
+    <section class="octofind-shell">
+      <p class="tool-subtitle">
+        Search all your favorite free media sites at once - videos, photos, public domain and PNG cutouts.
+      </p>
+
+      <section class="search-card">
+        <div class="search-row">
+          <label class="input-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input id="q" type="text" placeholder="Search term (e.g., forest)">
+          </label>
+          <button class="btn-main photos" id="btnPhotosMain">
+            <span class="dot"></span>Photos
+          </button>
+          <button class="btn-main videos" id="btnVideosMain">
+            <span class="dot"></span>Videos
+          </button>
+          <button class="btn-main public" id="btnPublicMain">
+            <span class="dot"></span>Public
+          </button>
+          <button class="btn-main png" id="btnPNGsMain">
+            <span class="dot"></span>PNGs
+          </button>
+        </div>
+        <div class="search-hint">
+          Press Enter to search Videos, or click a button to choose a category.
+        </div>
+      </section>
+
+      <section class="groups">
+        <div>
+          <div class="group-title">VIDEOS</div>
+          <div class="chips" id="chips-videos"></div>
+        </div>
+        <div>
+          <div class="group-title">PHOTOS</div>
+          <div class="chips" id="chips-photos"></div>
+        </div>
+        <div>
+          <div class="group-title">PUBLIC DOMAIN</div>
+          <div class="chips" id="chips-public"></div>
+        </div>
+        <div>
+          <div class="group-title">PNGS (TRANSPARENT)</div>
+          <div class="chips" id="chips-png"></div>
+        </div>
+      </section>
+
+      <p class="tip-line">
+        Tip: click a site name to enable/disable it for that category. Only enabled sites will open.
+      </p>
+
+      <div class="tool-footer">
+        <div class="tool-footer-controls">
+          <button class="btn-ghost" id="btn-manage">
+            <span class="icon">⚙️</span>
+            <span>Manage sites</span>
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <app-footer></app-footer>
+
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 class="modal-title">Manage search sites</h2>
+        <button class="btn-small" id="btn-close-modal">Close</button>
+      </div>
+      <div class="modal-body" id="sites-container"></div>
+      <div class="modal-foot">
+        <div class="modal-foot-buttons">
+          <button class="btn-small" id="btn-add-site">+ Add site</button>
+          <button class="btn-small" id="btn-save-sites">Save</button>
+          <button class="btn-small" id="btn-export-sites">Export</button>
+          <button class="btn-small" id="btn-import-sites">Import</button>
+        </div>
+        <span>
+          Use <code>%S</code> in the URL where the search term should go.
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <input type="file" id="import-file" accept="application/json" style="display:none" />
+
+  <script>
+    /* STORAGE KEYS -------------------------------------------------- */
+    const KEY_SITES  = "octofind-sites-v1";
+    const KEY_POPUP  = "octofind-popup-seen";
+
+    /* DEFAULT SITES ------------------------------------------------- */
+    const DEFAULT_SITES = [
+      { id:"pixabay_v",  name:"Pixabay (video)", category:"videos",
+        url:"https://pixabay.com/videos/search/%S/", enabled:true },
+      { id:"pexels_v",   name:"Pexels (video)", category:"videos",
+        url:"https://www.pexels.com/search/videos/%S/", enabled:true },
+      { id:"mixkit_v",   name:"Mixkit", category:"videos",
+        url:"https://mixkit.co/free-stock-video/%S/", enabled:true },
+      { id:"freepik_v",  name:"Freepik (FREE video)", category:"videos",
+        url:"https://www.freepik.com/search?format=search&last_filter=selection&last_value=1&query=%S&selection=1&type=video",
+        enabled:true },
+
+      { id:"pixabay_p",  name:"Pixabay (photo)", category:"photos",
+        url:"https://pixabay.com/images/search/%S/", enabled:true },
+      { id:"pexels_p",   name:"Pexels (photo)", category:"photos",
+        url:"https://www.pexels.com/search/%S/", enabled:true },
+      { id:"unsplash_p", name:"Unsplash", category:"photos",
+        url:"https://unsplash.com/s/photos/%S", enabled:true },
+      { id:"freepik_p",  name:"Freepik (FREE photos)", category:"photos",
+        url:"https://www.freepik.com/search?format=search&last_filter=selection&last_value=1&query=%S&selection=1&type=photo",
+        enabled:true },
+      { id:"openverse_p",name:"Openverse", category:"photos",
+        url:"https://openverse.org/search/image?q=%S", enabled:false },
+
+      { id:"picryl_pd",  name:"Picryl (PD)", category:"public",
+        url:"https://picryl.com/search?q=%S", enabled:true },
+      { id:"commons_pd", name:"Wikimedia Commons", category:"public",
+        url:"https://commons.wikimedia.org/w/index.php?search=%S&title=Special%3AMediaSearch&type=image",
+        enabled:true },
+
+      { id:"kindpng_png", name:"KindPNG", category:"png",
+        url:"https://www.kindpng.com/free/%S/", enabled:true },
+      { id:"rawpixel_png", name:"Rawpixel", category:"png",
+        url:"https://www.rawpixel.com/search/%S", enabled:true },
+      { id:"pngegg_png",  name:"PngEgg", category:"png",
+        url:"https://www.pngegg.com/en/search?q=%S", enabled:true }
+    ];
+
+    let sites = loadSites();
+
+    /* DOM REFS ------------------------------------------------------ */
+    const q              = document.getElementById("q");
+    const btnVideosMain  = document.getElementById("btnVideosMain");
+    const btnPhotosMain  = document.getElementById("btnPhotosMain");
+    const btnPublicMain  = document.getElementById("btnPublicMain");
+    const btnPNGsMain    = document.getElementById("btnPNGsMain");
+    
+    const btnManage      = document.getElementById("btn-manage");
+    const modalBackdrop  = document.getElementById("modal-backdrop");
+    const btnCloseModal  = document.getElementById("btn-close-modal");
+    
+    const btnAddSite     = document.getElementById("btn-add-site");
+    const btnSaveSites   = document.getElementById("btn-save-sites");
+    const btnExportSites = document.getElementById("btn-export-sites");
+    const btnImportSites = document.getElementById("btn-import-sites");
+    const sitesContainer = document.getElementById("sites-container");
+    const importFile     = document.getElementById("import-file");
+
+    const popupStrip     = document.getElementById("popupStrip");
+    const popupDismiss   = document.getElementById("popupDismiss");
+
+    /* STORAGE ------------------------------------------------------- */
+    function loadSites() {
+      try {
+        const raw = localStorage.getItem(KEY_SITES);
+        if (!raw) return structuredClone(DEFAULT_SITES);
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed) || !parsed.length) return structuredClone(DEFAULT_SITES);
+        return parsed;
+      } catch (e) {
+        console.warn("Failed to load sites, using defaults", e);
+        return structuredClone(DEFAULT_SITES);
+      }
+    }
+    function saveSites() {
+      try {
+        localStorage.setItem(KEY_SITES, JSON.stringify(sites));
+      } catch (e) {
+        console.warn("Failed to save sites", e);
+      }
+    }
+
+    /* CHIPS --------------------------------------------------------- */
+    function renderChips() {
+      const containers = {
+        videos: document.getElementById("chips-videos"),
+        photos: document.getElementById("chips-photos"),
+        public: document.getElementById("chips-public"),
+        png:    document.getElementById("chips-png")
+      };
+      Object.values(containers).forEach(c => c.innerHTML = "");
+
+      for (const s of sites) {
+        const parent = containers[s.category];
+        if (!parent) continue;
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "chip" + (s.enabled ? "" : " off");
+        chip.dataset.siteId = s.id;
+        chip.innerHTML = `<span class="chip-dot"></span><span>${s.name}</span>`;
+        chip.onclick = () => toggleSiteEnabled(s.id);
+        parent.appendChild(chip);
+      }
+    }
+
+    function toggleSiteEnabled(id) {
+      const idx = sites.findIndex(s => s.id === id);
+      if (idx === -1) return;
+      sites[idx].enabled = !sites[idx].enabled;
+      saveSites();
+      renderChips();
+    }
+
+    /* SEARCH -------------------------------------------------------- */
+    function searchCategory(category) {
+      const term = q.value.trim();
+      if (!term) return;
+
+      const encoded = encodeURIComponent(term);
+      const list = sites.filter(s => s.category === category && s.enabled);
+
+      if (!list.length) {
+        alert("No sites enabled for this category.");
+        return;
+      }
+
+      for (const s of list) {
+        let url = s.url || "";
+        if (url.includes("%S")) url = url.replace(/%S/g, encoded);
+        window.open(url, "_blank");
+      }
+    }
+
+    function handleKey(ev) {
+      if (ev.key === "Enter") searchCategory("videos");
+    }
+
+    /* MODAL --------------------------------------------------------- */
+    function renderManageRows() {
+      sitesContainer.innerHTML = "";
+      sites.forEach((s, index) => addRowForSite(s, index));
+    }
+
+    function addRowForSite(site, index) {
+      const row = document.createElement("div");
+      row.className = "site-row";
+      row.dataset.index = index;
+      row.innerHTML = `
+        <input type="text" class="mf-name" value="${site.name.replace(/"/g,'&quot;')}">
+        <input type="text" class="mf-url" value="${site.url.replace(/"/g,'&quot;')}">
+        <select class="mf-cat">
+          <option value="videos"${site.category==="videos"?" selected":""}>Videos</option>
+          <option value="photos"${site.category==="photos"?" selected":""}>Photos</option>
+          <option value="public"${site.category==="public"?" selected":""}>Public</option>
+          <option value="png"${site.category==="png"?" selected":""}>PNGs</option>
+        </select>
+        <div class="site-row-actions">
+          <label class="small-check">
+            <input type="checkbox" class="mf-enabled"${site.enabled ? " checked" : ""}> on
+          </label>
+          <button class="remove">✕</button>
+        </div>
+      `;
+      row.querySelector("button.remove").onclick = () => {
+        const idx = Number(row.dataset.index);
+        if (!Number.isNaN(idx)) {
+          sites.splice(idx, 1);
+          renderManageRows();
+        }
+      };
+      sitesContainer.appendChild(row);
+    }
+
+    /* EXPORT / IMPORT ----------------------------------------------- */
+    function exportSites() {
+      try {
+        const data = JSON.stringify(sites, null, 2);
+        const blob = new Blob([data], {type:"application/json"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "octofind-sites.json";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+      } catch (e) {
+        alert("Could not export sites.");
+      }
+    }
+
+    function importSitesFromFile(file) {
+      const reader = new FileReader();
+      reader.onload = ev => {
+        try {
+          const data = JSON.parse(ev.target.result);
+          if (!Array.isArray(data)) throw new Error("Not an array");
+          const allowed = new Set(["videos","photos","public","png"]);
+          const cleaned = data.map((s,i)=>({
+            id: s.id || ("import_"+Date.now()+"_"+i),
+            name: String(s.name || "Untitled"),
+            url: String(s.url || "").trim(),
+            category: allowed.has(s.category) ? s.category : "photos",
+            enabled: Boolean(s.enabled)
+          })).filter(s => s.url);
+          if (!cleaned.length) throw new Error("No valid entries");
+          sites = cleaned;
+          saveSites();
+          renderChips();
+          renderManageRows();
+          alert("Sites imported successfully.");
+        } catch (e) {
+          console.error(e);
+          alert("Could not import this file. Is it an OctoFind export?");
+        } finally {
+          importFile.value = "";
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    /* EVENTS -------------------------------------------------------- */
+    btnVideosMain.onclick = () => searchCategory("videos");
+    btnPhotosMain.onclick = () => searchCategory("photos");
+    btnPublicMain.onclick = () => searchCategory("public");
+    btnPNGsMain.onclick   = () => searchCategory("png");
+    q.addEventListener("keydown", handleKey);
+
+    btnManage.onclick = () => {
+      renderManageRows();
+      modalBackdrop.classList.add("show");
+    };
+    btnCloseModal.onclick = () => modalBackdrop.classList.remove("show");
+    modalBackdrop.addEventListener("click", e => {
+      if (e.target === modalBackdrop) modalBackdrop.classList.remove("show");
+    });
+    document.addEventListener("keydown", e => {
+      if (e.key === "Escape") modalBackdrop.classList.remove("show");
+    });
+
+    btnAddSite.onclick = () => {
+      sites.push({
+        id: "custom_"+Date.now(),
+        name: "New site",
+        url: "https://example.com/search/%S",
+        category: "photos",
+        enabled: true
+      });
+      renderManageRows();
+    };
+
+    btnSaveSites.onclick = () => {
+      const rows = [...sitesContainer.querySelectorAll(".site-row")];
+      const updated = [];
+      for (const row of rows) {
+        const idx = Number(row.dataset.index);
+        const original = sites[idx] || {};
+        const name = row.querySelector(".mf-name").value.trim() || "Untitled";
+        const url  = row.querySelector(".mf-url").value.trim();
+        const cat  = row.querySelector(".mf-cat").value;
+        const enabled = row.querySelector(".mf-enabled").checked;
+        if (!url) continue;
+        updated.push({
+          id: original.id || ("custom_"+Date.now()+"_"+Math.random().toString(16).slice(2)),
+          name, url, category: cat, enabled
+        });
+      }
+      sites = updated;
+      saveSites();
+      renderChips();
+      modalBackdrop.classList.remove("show");
+    };
+
+    btnExportSites.onclick = exportSites;
+    btnImportSites.onclick = () => importFile.click();
+    importFile.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if (file) importSitesFromFile(file);
+    });
+
+    /* POPUP STRIP --------------------------------------------------- */
+    popupDismiss.onclick = () => {
+      popupStrip.style.display = "none";
+      localStorage.setItem(KEY_POPUP, "1");
+    };
+
+    /* INIT ---------------------------------------------------------- */
+    renderChips();
+
+    if (localStorage.getItem(KEY_POPUP) === "1") {
+      popupStrip.style.display = "none";
+    } else {
+      popupStrip.style.display = "flex";
+    }
+  </script>
+
+  <script src="https://cdn.counter.dev/script.js"
+          data-id="dd7fb35a-238d-4948-a5a8-694b141e7608"
+          data-utcoffset="-6"></script>
+</body>
+</html>

@@ -1,0 +1,512 @@
+:root {
+  --blue:   #0099CC;
+  --yellow: #FFCC33;
+  --white:  #FDFDF9;
+  --text-dark: #1A1A1A;
+  --graphite: #393939;
+  --red:    #c03221;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Prevents horizontal scrollbars globally */
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: var(--text-dark);
+  background: radial-gradient(circle at top, #00a8dd 0%, #0099CC 48%, #0081aa 100%);
+  
+  /* STICKY FOOTER SETUP */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ----------------------------------------------------------
+   HEADER (shared)
+---------------------------------------------------------- */
+header {
+  background: #ffffff;
+  color: var(--text-dark);
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  box-shadow: 0 8px 22px rgba(0,0,0,0.08);
+  position: relative;
+  z-index: 10;
+}
+
+.header-brand {
+  white-space: nowrap;
+}
+
+.header-text-title {
+  font-size: 2.6rem;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  color: var(--blue);
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.03em;
+}
+
+.z-icon img {
+  height: 1.1em;
+  width: auto;
+  margin-top: 8px;
+  margin-left: -6px;
+  margin-right: -5px;
+}
+
+/* Subtitle */
+.header-sub {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.header-sub img {
+  width: 220px; 
+  height: auto;
+  display: block;
+}
+
+.header-text-subtitle {
+  font-size: 0.85rem !important; 
+  font-weight: 500;
+  color: #555; 
+  letter-spacing: 0.02em; 
+  margin-top: 8px; 
+  max-width: 600px;
+  line-height: 1.4;
+}
+
+/* Right side (language selector) */
+.header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+}
+
+/* ----------------------------------------------------------
+   LANGUAGE TOGGLE
+---------------------------------------------------------- */
+.lang-toggle {
+  display: inline-flex;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.12);
+  background: #ffffff;
+}
+
+.lang-btn {
+  border: none;
+  padding: 6px 14px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: transparent;
+  color: var(--text-dark);
+  cursor: pointer;
+}
+
+.lang-btn + .lang-btn {
+  border-left: 1px solid rgba(0,0,0,0.08);
+}
+
+.lang-btn.active {
+  background: rgba(0,153,204,0.12);
+  color: var(--blue);
+  font-weight: 600;
+}
+
+/* ----------------------------------------------------------
+   HEADER MOBILE
+---------------------------------------------------------- */
+@media (max-width: 800px) {
+  header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .header-brand {
+    align-self: center;
+  }
+
+  .header-sub {
+    order: 3;
+    margin-top: 6px;
+  }
+
+  .header-right {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* ----------------------------------------------------------
+   YELLOW MENU BAR
+---------------------------------------------------------- */
+.app-menu-bar {
+  background: var(--yellow);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.18); 
+  position: relative;
+  z-index: 150;
+}
+
+.app-menu-inner {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 6px 24px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ----------------------------------------------------------
+   NAVIGATION
+---------------------------------------------------------- */
+.main-nav {
+  font-size: 0.75rem;
+}
+
+.nav-list {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-link,
+.nav-link--button {
+  appearance: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 500;
+  color: var(--graphite);
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 1.00rem;
+}
+
+.nav-link:hover,
+.nav-link--button:hover {
+  background: rgba(255,255,255,0.35);
+}
+
+.nav-disabled {
+  opacity: 0.45;
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Dropdown */
+.nav-item {
+  position: relative;
+}
+
+.nav-submenu {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18);
+  min-width: 150px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 150ms ease, transform 150ms ease;
+  transform: translateY(-4px);
+  z-index: 300;
+}
+
+.nav-submenu a {
+  display: block;
+  padding: 6px 14px;
+  text-decoration: none;
+  font-weight: 500;
+  color: var(--text-dark);
+  font-size: 0.86rem;
+}
+
+.nav-submenu a:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.nav-item:hover > .nav-submenu,
+.nav-item:focus-within > .nav-submenu {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+/* Mobile */
+@media (max-width: 800px) {
+  .app-menu-inner {
+    justify-content: center;
+  }
+  .nav-list {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* ----------------------------------------------------------
+   MAIN CONTENT AREAS
+   These flex: 1 to push the footer down naturally
+---------------------------------------------------------- */
+main, 
+.landing-main, 
+.page-main {
+  flex: 1;
+  width: 100%;
+}
+
+.landing-main {
+  max-width: 1180px;
+  margin: 32px auto 40px;
+  padding: 0 16px 16px;
+  margin-top: 24px;   
+}
+
+/* THE FIX: 
+   Use Padding for vertical spacing, NOT margin.
+   Margin on a 100% height container forces scrollbars.
+   Padding keeps the spacing 'inside' the flexible area.
+*/
+.page-main {
+  width: 100%;
+  max-width: 1100px;
+  
+  /* Center Horizontal */
+  margin: 0 auto; 
+  
+  /* Top padding provides the visual gap from the header */
+  padding: 48px 20px 32px; 
+}
+
+/* ----------------------------------------------------------
+   FOOTER (shared)
+---------------------------------------------------------- */
+footer {
+  text-align: center;
+  padding: 18px 12px 26px;
+  font-size: 0.9rem;
+  background: rgba(0,0,0,0.12);
+  color: #f9fafb;
+  border-top: 1px solid rgba(0,0,0,0.15);
+  backdrop-filter: blur(8px);
+  
+  /* Pushes footer to bottom if content is extremely short */
+  margin-top: auto; 
+  width: 100%;
+}
+
+footer a {
+  color: var(--yellow);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-decoration: underline;
+}
+
+.logo-link {
+  text-decoration: none;
+  color: inherit;
+  display: inline-flex;
+}
+
+.logo-link:visited {
+  color: inherit;
+}
+
+/* ========== APP HEADER BADGE ========== */
+
+.app-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+               "Segoe UI", sans-serif;
+}
+
+/* ---------- LARGE BADGE VARIANT ---------- */
+
+.app-badge--large {
+  transform: scale(1.35);        /* scales the entire block */
+  transform-origin: left center; /* keeps it aligned to the left */
+}
+
+
+/* Circular icon */
+.app-badge__icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #FFCC33;      /* yellow circle */
+  color: #0A0019;           /* dark text inside */
+  font-weight: 700;
+  font-size: 1.4rem;
+  letter-spacing: 0.05em;
+}
+
+/* Title text: BGone in blue, no background */
+.app-badge__title {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #0099CC;           /* Blizlab blue */
+}
+
+/* Optional: smaller version for tight headers */
+.app-badge--compact .app-badge__icon {
+  width: 26px;
+  height: 26px;
+  font-size: 0.95rem;
+}
+
+.app-badge--compact .app-badge__title {
+  font-size: 1.1rem;
+}
+
+
+/* Shared title-bar wrapper for all Blizlab apps */
+.app-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  width: 100%;
+  margin-bottom: 18px;
+}
+
+/* Optional: allow subtitle pill to shrink on smaller screens */
+.app-header-row .status-pill {
+  white-space: nowrap;
+  flex-shrink: 1;
+}
+
+
+/* Big white shell card */
+.app-shell {
+  background: #fdfdf9;
+  border-radius: 26px;
+  padding: 18px 20px 22px;
+  box-shadow:
+    0 24px 40px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.7);
+}
+
+.icon-kofi {
+  width: 20px;
+  height: 20px;
+  vertical-align: -4px;
+}
+
+.nav-icon {
+  width: 1.2em;
+  height: 1.2em;
+  margin-right: 6px;
+  vertical-align: -0.15em;
+  display: inline-block;
+}
+
+/* ----------------------------------------------------------
+   NEW APP BRANDING (Modern Title)
+---------------------------------------------------------- */
+
+.app-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px; /* Space between icon and text */
+}
+
+/* The Container for the SVG Icon */
+.app-brand-icon {
+  width: 40px;
+  height: 40px;
+  
+  /* UPDATED: Blue background with radial gradient */
+  background: radial-gradient(circle at center, #00a8dd 0%, var(--blue) 100%);
+  
+  /* UPDATED: Border adjusted to match the blue theme */
+  border: 0px solid rgba(0, 153, 204, 0.3);
+  
+  border-radius: 10px; /* Kept squared as requested */
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* UPDATED: Shadow color changed from yellow to blue */
+  box-shadow: 
+    0 4px 12px rgba(0, 153, 204, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+    
+  /* UPDATED: Icon color set to Yellow */
+  color: var(--yellow); 
+  
+  transition: transform 0.2s ease;
+}
+
+.app-brand:hover .app-brand-icon {
+  transform: scale(1.05) rotate(-3deg);
+}
+
+/* The SVG inside the container */
+.app-brand-icon svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor; /* Inherits color from parent */
+  display: block;
+}
+
+/* The Text (Chrono + Meter style) */
+.app-brand-text {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-weight: 800;
+  font-size: 2.2rem;
+  letter-spacing: -0.04em;
+  
+  /* UPDATED: First part of the word is now Graphite */
+  color: var(--graphite); 
+  
+  line-height: 1;
+
+  /* Blue shadow: Soft glow behind the text */
+  text-shadow: 0 8px 24px rgba(0, 153, 204, 0.2);
+}
+
+/* The blue part (wrap the second half of your word in <span class="highlight">...</span>) */
+.app-brand-text .highlight {
+  color: var(--blue);
+}
+
+/* Optional: Highlight part of the text in Blue */
+.app-brand-text .highlight {
+  color: var(--blue);
+}

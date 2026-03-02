@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Monthly Planner</title>
+    <link rel="icon" type="image/svg+xml" href="/assets/svg/fabicon.svg">
+    <link rel="stylesheet" href="/assets/css/global.css">
+    <script src="/assets/components.js" defer></script>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <app-header layout="compact" app-title="Calendar"></app-header>
+
+    <main class="page-main">
+      <section class="calendar-shell">
+        <p class="tool-subtitle">Minimal monthly planner for print.</p>
+
+        <section class="controls no-print">
+          <div class="control-group">
+            <label for="year">Year</label>
+            <input id="year" type="number" min="1900" max="2100" />
+          </div>
+          <div class="control-group">
+            <label for="month">Month</label>
+            <select id="month"></select>
+          </div>
+          <button id="generate">Generate</button>
+          <button id="download">Download PDF</button>
+          <div class="filter-wrap">
+            <button id="filter-toggle" class="filter-toggle" type="button" aria-expanded="false" aria-controls="filter-panel" title="Filter holidays">
+              <span class="bar"></span>
+              <span class="bar"></span>
+              <span class="bar"></span>
+            </button>
+            <div id="filter-panel" class="filter-panel" aria-hidden="true">
+              <label class="filter-item">
+                <input type="checkbox" id="filter-official" checked />
+                <span class="holiday-icon official"></span>
+                Official US
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" id="filter-observed" checked />
+                <span class="holiday-icon observed"></span>
+                Observed
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" id="filter-religious" checked />
+                <span class="holiday-icon religious"></span>
+                Religious
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" id="filter-other" checked />
+                <span class="holiday-icon other"></span>
+                Other
+              </label>
+              <label class="filter-item">
+                <input type="checkbox" id="filter-astronomical" checked />
+                <span class="holiday-icon astronomical"></span>
+                Astronomical
+              </label>
+              <div class="filter-note">Religious & lunar dates can vary by tradition/location.</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="planner" id="planner">
+          <div class="planner-print" id="planner-print">
+            <div class="planner-body">
+              <div class="calendar" id="calendar"></div>
+            </div>
+            <div class="calendar-footer">
+              <div class="calendar-legend" id="calendar-legend"></div>
+              <div class="calendar-brand">Blizlab.com</div>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <app-footer></app-footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="app.js"></script>
+  </body>
+</html>

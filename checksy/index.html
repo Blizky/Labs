@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Checksy – Handle checker for creators</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <link rel="icon" type="image/svg+xml" href="/assets/svg/fabicon.svg">
+  <link rel="stylesheet" href="/assets/css/global.css">
+  <script src="/assets/components.js" defer></script>
+
+  <link rel="stylesheet" href="checksy.css">
+</head>
+
+<body>
+
+  <app-header layout="compact" app-title="Checksy"></app-header>
+
+  <main class="page-main">
+    <div class="popup-strip" id="popupStrip">
+      <div class="popup-strip-main">
+        <span class="icon">⚠️</span>
+        <span id="popupText">
+          To open multiple sites at once, please allow pop-ups for this page.
+        </span>
+      </div>
+      <button id="popupDismiss">Got it</button>
+    </div>
+
+    <section class="checksy-shell tool-card">
+      <p class="tool-subtitle" id="toolSubtitle">
+        Check if your creator name is available across multiple platforms with one click.
+      </p>
+      
+      <section class="search-card">
+        <div class="search-row">
+          <label class="input-wrap">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+              <circle cx="11" cy="11" r="7"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input id="handle" type="text" autocomplete="off"
+                   placeholder="Creator name (e.g., Blizlab)">
+          </label>
+          <button class="btn-main" id="btnCheck">
+            <span id="btnCheckLabel">Check name</span>
+          </button>
+        </div>
+        <div class="search-hint" id="searchHint">
+          Press Enter or click “Check name”. Spaces will be removed so the handle works on most sites.
+        </div>
+      </section>
+
+      <section class="groups">
+        <div class="groups-header">
+          <div class="group-title-main" id="sitesTitle">SITES</div>
+          <button id="btnClear" class="btn-ghost-small">Deselect all</button>
+        </div>
+        <div id="groupsContainer"></div>
+      </section>
+
+      <p class="tip-line" id="tipLine">
+        Tip: click a site chip to enable or disable it. Only enabled sites will open.
+      </p>
+
+      <div class="tool-footer">
+        <span class="tool-footer-count" id="enabledCount">0 / 0 sites enabled.</span>
+        <span id="footerHint">
+          Handles are not reserved here — this just opens each site so you can check by yourself.
+        </span>
+      </div>
+    </section>
+  </main>
+
+  <app-footer></app-footer>
+
+  <script type="module" src="checksy.js"></script>
+
+  <script src="https://cdn.counter.dev/script.js"
+          data-id="dd7fb35a-238d-4948-a5a8-694b141e7608"
+          data-utcoffset="-6"></script>
+</body>
+</html>
