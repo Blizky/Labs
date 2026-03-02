@@ -8,8 +8,27 @@
   <link rel="icon" type="image/svg+xml" href="/assets/svg/fabicon.svg">
   <link rel="stylesheet" href="/assets/css/global.css">
   <script src="/assets/components.js" defer></script>
-
   <link rel="stylesheet" href="chrono.css">
+  <script>
+    if (new URLSearchParams(window.location.search).get("embed") === "1") {
+      document.documentElement.classList.add("embed-mode");
+    }
+  </script>
+  <style>
+    html.embed-mode app-header,
+    html.embed-mode app-footer {
+      display: none !important;
+    }
+    html.embed-mode,
+    html.embed-mode body {
+      background: #E4E8EB !important;
+      background-image: none !important;
+      color: #24292d;
+    }
+    html.embed-mode .page-main {
+      background: transparent !important;
+    }
+  </style>
 </head>
 
 <body>

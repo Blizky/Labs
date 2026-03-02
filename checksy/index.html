@@ -7,9 +7,29 @@
 
   <link rel="icon" type="image/svg+xml" href="/assets/svg/fabicon.svg">
   <link rel="stylesheet" href="/assets/css/global.css">
+  <link rel="stylesheet" href="/assets/css/essentials.css">
   <script src="/assets/components.js" defer></script>
-
   <link rel="stylesheet" href="checksy.css">
+  <script>
+    if (new URLSearchParams(window.location.search).get("embed") === "1") {
+      document.documentElement.classList.add("embed-mode");
+    }
+  </script>
+  <style>
+    html.embed-mode app-header,
+    html.embed-mode app-footer {
+      display: none !important;
+    }
+    html.embed-mode,
+    html.embed-mode body {
+      background: #E4E8EB !important;
+      background-image: none !important;
+      color: #24292d;
+    }
+    html.embed-mode .page-main {
+      background: transparent !important;
+    }
+  </style>
 </head>
 
 <body>
@@ -27,26 +47,31 @@
       <button id="popupDismiss">Got it</button>
     </div>
 
-    <section class="checksy-shell tool-card">
-      <p class="tool-subtitle" id="toolSubtitle">
-        Check if your creator name is available across multiple platforms with one click.
+    <section class="app-shell">
+      <p class="app-subtitle" id="toolSubtitle">
+        <strong>Checksy</strong> tests a username across selected sites in one click.<br>
+        1. Enter a handle, run <strong>Check name</strong>.<br>
+        2. Allow pop-ups and third-party redirects on your browser.<button type="button" class="help-inline-link help-inline-icon" id="helpPopupTrigger" aria-label="How to allow pop-ups and redirects">
+          <img src="/assets/svg/icons/question_fill.svg" alt="" width="16" height="16" aria-hidden="true">
+        </button><br>
+        3. Review each tab: <strong>not found</strong> or <strong>unavailable</strong> usually means the name may be free there.
       </p>
       
-      <section class="search-card">
-        <div class="search-row">
-          <label class="input-wrap">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+      <section class="app-search-card">
+        <div class="app-search-row">
+          <label class="app-input-wrap">
+            <svg class="app-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
               <circle cx="11" cy="11" r="7"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input id="handle" type="text" autocomplete="off"
+            <input class="app-input" id="handle" type="text" autocomplete="off"
                    placeholder="Creator name (e.g., Blizlab)">
           </label>
-          <button class="btn-main" id="btnCheck">
+          <button class="app-btn" id="btnCheck">
             <span id="btnCheckLabel">Check name</span>
           </button>
         </div>
-        <div class="search-hint" id="searchHint">
+        <div class="app-search-hint" id="searchHint">
           Press Enter or click “Check name”. Spaces will be removed so the handle works on most sites.
         </div>
       </section>
@@ -54,16 +79,16 @@
       <section class="groups">
         <div class="groups-header">
           <div class="group-title-main" id="sitesTitle">SITES</div>
-          <button id="btnClear" class="btn-ghost-small">Deselect all</button>
+          <button id="btnClear" class="app-btn app-btn--small btn-ghost-small">Deselect all</button>
         </div>
         <div id="groupsContainer"></div>
       </section>
 
-      <p class="tip-line" id="tipLine">
+      <p class="app-tip-line" id="tipLine">
         Tip: click a site chip to enable or disable it. Only enabled sites will open.
       </p>
 
-      <div class="tool-footer">
+      <div class="app-footer-row">
         <span class="tool-footer-count" id="enabledCount">0 / 0 sites enabled.</span>
         <span id="footerHint">
           Handles are not reserved here — this just opens each site so you can check by yourself.
@@ -73,6 +98,29 @@
   </main>
 
   <app-footer></app-footer>
+
+  <div class="app-modal-backdrop" id="help-backdrop" aria-hidden="true">
+    <div class="app-modal" role="dialog" aria-modal="true" aria-labelledby="help-title">
+      <div class="app-modal-head">
+        <h2 class="app-modal-title" id="help-title">How to allow pop-ups and redirects</h2>
+        <button class="app-btn app-btn--small" id="help-close" type="button">Close</button>
+      </div>
+      <div class="app-modal-body help-modal-body">
+        <p>Checksy opens one tab per enabled site. If your browser blocks these tabs, follow this flow:</p>
+        <ol>
+          <li>Run <strong>Check name</strong> once.</li>
+          <li>When a pop-up blocked message/icon appears, click it.</li>
+          <li>Choose <strong>Always allow pop-ups and redirects</strong> for this page.</li>
+          <li>If needed, allow third-party redirects/cross-site access for this page in site settings.</li>
+          <li>Run <strong>Check name</strong> again.</li>
+        </ol>
+        <p>
+          Result check: if the page says <em>user not found</em>, <em>page not found</em>, or
+          <em>unavailable</em>, the handle is often available. If a profile page loads, it is usually taken.
+        </p>
+      </div>
+    </div>
+  </div>
 
   <script type="module" src="checksy.js"></script>
 

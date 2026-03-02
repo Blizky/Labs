@@ -183,6 +183,9 @@ const enabledCountEl  = document.getElementById("enabledCount");
 const popupStrip      = document.getElementById("popupStrip");
 const popupDismiss    = document.getElementById("popupDismiss");
 const btnClear        = document.getElementById("btnClear");
+const helpPopupTrigger = document.getElementById("helpPopupTrigger");
+const helpBackdrop     = document.getElementById("help-backdrop");
+const helpClose        = document.getElementById("help-close");
 
 /* STORAGE ------------------------------------------------------- */
 function cloneDefaultSites() {
@@ -348,6 +351,28 @@ popupDismiss.addEventListener("click", () => {
   popupStrip.style.display = "none";
   localStorage.setItem(KEY_POPUP, "1");
 });
+
+if (helpPopupTrigger && helpBackdrop && helpClose) {
+  helpPopupTrigger.addEventListener("click", () => {
+    helpBackdrop.classList.add("show");
+  });
+
+  helpClose.addEventListener("click", () => {
+    helpBackdrop.classList.remove("show");
+  });
+
+  helpBackdrop.addEventListener("click", ev => {
+    if (ev.target === helpBackdrop) {
+      helpBackdrop.classList.remove("show");
+    }
+  });
+
+  document.addEventListener("keydown", ev => {
+    if (ev.key === "Escape") {
+      helpBackdrop.classList.remove("show");
+    }
+  });
+}
 
 /* INIT ---------------------------------------------------------- */
 renderChips();

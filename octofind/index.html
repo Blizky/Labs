@@ -7,10 +7,29 @@
 
   <link rel="icon" type="image/svg+xml" href="/assets/svg/fabicon.svg">
   <link rel="stylesheet" href="/assets/css/global.css">
+  <link rel="stylesheet" href="/assets/css/essentials.css">
   <script src="/assets/components.js" defer></script>
-
   <link rel="stylesheet" href="octofind.css"> 
-  
+  <script>
+    if (new URLSearchParams(window.location.search).get("embed") === "1") {
+      document.documentElement.classList.add("embed-mode");
+    }
+  </script>
+  <style>
+    html.embed-mode app-header,
+    html.embed-mode app-footer {
+      display: none !important;
+    }
+    html.embed-mode,
+    html.embed-mode body {
+      background: #E4E8EB !important;
+      background-image: none !important;
+      color: #24292d;
+    }
+    html.embed-mode .page-main {
+      background: transparent !important;
+    }
+  </style>
 </head>
 
 <body>
@@ -28,65 +47,65 @@
       <button id="popupDismiss">Got it</button>
     </div>
 
-    <section class="octofind-shell">
-      <p class="tool-subtitle">
+    <section class="app-shell">
+      <p class="app-subtitle">
         Search all your favorite free media sites at once - videos, photos, public domain and PNG cutouts.
       </p>
 
-      <section class="search-card">
-        <div class="search-row">
-          <label class="input-wrap">
-            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+      <section class="app-search-card">
+        <div class="app-search-row">
+          <label class="app-input-wrap">
+            <svg class="app-input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
               <circle cx="11" cy="11" r="7"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <input id="q" type="text" placeholder="Search term (e.g., forest)">
+            <input class="app-input" id="q" type="text" placeholder="Search term (e.g., forest)">
           </label>
-          <button class="btn-main photos" id="btnPhotosMain">
-            <span class="dot"></span>Photos
+          <button class="app-btn app-btn--category is-photos" id="btnPhotosMain">
+            <span class="app-btn-dot"></span>Photos
           </button>
-          <button class="btn-main videos" id="btnVideosMain">
-            <span class="dot"></span>Videos
+          <button class="app-btn app-btn--category is-videos" id="btnVideosMain">
+            <span class="app-btn-dot"></span>Videos
           </button>
-          <button class="btn-main public" id="btnPublicMain">
-            <span class="dot"></span>Public
+          <button class="app-btn app-btn--category is-public" id="btnPublicMain">
+            <span class="app-btn-dot"></span>Public
           </button>
-          <button class="btn-main png" id="btnPNGsMain">
-            <span class="dot"></span>PNGs
+          <button class="app-btn app-btn--category is-png" id="btnPNGsMain">
+            <span class="app-btn-dot"></span>PNGs
           </button>
         </div>
-        <div class="search-hint">
+        <div class="app-search-hint">
           Press Enter to search Videos, or click a button to choose a category.
         </div>
       </section>
 
-      <section class="groups">
+      <section class="app-list-grid">
         <div>
-          <div class="group-title">VIDEOS</div>
-          <div class="chips" id="chips-videos"></div>
+          <div class="app-section-title">VIDEOS</div>
+          <div class="app-toggle-list" id="chips-videos"></div>
         </div>
         <div>
-          <div class="group-title">PHOTOS</div>
-          <div class="chips" id="chips-photos"></div>
+          <div class="app-section-title">PHOTOS</div>
+          <div class="app-toggle-list" id="chips-photos"></div>
         </div>
         <div>
-          <div class="group-title">PUBLIC DOMAIN</div>
-          <div class="chips" id="chips-public"></div>
+          <div class="app-section-title">PUBLIC DOMAIN</div>
+          <div class="app-toggle-list" id="chips-public"></div>
         </div>
         <div>
-          <div class="group-title">PNGS (TRANSPARENT)</div>
-          <div class="chips" id="chips-png"></div>
+          <div class="app-section-title">PNGS (TRANSPARENT)</div>
+          <div class="app-toggle-list" id="chips-png"></div>
         </div>
       </section>
 
-      <p class="tip-line">
+      <p class="app-tip-line">
         Tip: click a site name to enable/disable it for that category. Only enabled sites will open.
       </p>
 
-      <div class="tool-footer">
-        <div class="tool-footer-controls">
-          <button class="btn-ghost" id="btn-manage">
-            <span class="icon">⚙️</span>
+      <div class="app-footer-row">
+        <div class="app-footer-controls">
+          <button class="app-btn app-btn--ghost" id="btn-manage">
+            <img class="icon-img" src="/assets/svg/icons/settings_3_fill.svg" alt="" width="14" height="14" aria-hidden="true">
             <span>Manage sites</span>
           </button>
         </div>
@@ -96,19 +115,19 @@
 
   <app-footer></app-footer>
 
-  <div class="modal-backdrop" id="modal-backdrop">
-    <div class="modal">
-      <div class="modal-head">
-        <h2 class="modal-title">Manage search sites</h2>
-        <button class="btn-small" id="btn-close-modal">Close</button>
+  <div class="app-modal-backdrop" id="modal-backdrop">
+    <div class="app-modal">
+      <div class="app-modal-head">
+        <h2 class="app-modal-title">Manage search sites</h2>
+        <button class="app-btn app-btn--small" id="btn-close-modal">Close</button>
       </div>
-      <div class="modal-body" id="sites-container"></div>
-      <div class="modal-foot">
-        <div class="modal-foot-buttons">
-          <button class="btn-small" id="btn-add-site">+ Add site</button>
-          <button class="btn-small" id="btn-save-sites">Save</button>
-          <button class="btn-small" id="btn-export-sites">Export</button>
-          <button class="btn-small" id="btn-import-sites">Import</button>
+      <div class="app-modal-body" id="sites-container"></div>
+      <div class="app-modal-foot">
+        <div class="app-modal-foot-buttons">
+          <button class="app-btn app-btn--small" id="btn-add-site">+ Add site</button>
+          <button class="app-btn app-btn--small" id="btn-save-sites">Save</button>
+          <button class="app-btn app-btn--small" id="btn-export-sites">Export</button>
+          <button class="app-btn app-btn--small" id="btn-import-sites">Import</button>
         </div>
         <span>
           Use <code>%S</code> in the URL where the search term should go.
@@ -206,7 +225,7 @@
       }
     }
 
-    /* CHIPS --------------------------------------------------------- */
+    /* CATEGORY LISTS ------------------------------------------------ */
     function renderChips() {
       const containers = {
         videos: document.getElementById("chips-videos"),
@@ -219,20 +238,35 @@
       for (const s of sites) {
         const parent = containers[s.category];
         if (!parent) continue;
-        const chip = document.createElement("button");
-        chip.type = "button";
-        chip.className = "chip" + (s.enabled ? "" : " off");
-        chip.dataset.siteId = s.id;
-        chip.innerHTML = `<span class="chip-dot"></span><span>${s.name}</span>`;
-        chip.onclick = () => toggleSiteEnabled(s.id);
-        parent.appendChild(chip);
+        const item = document.createElement("label");
+        item.className = "app-toggle-item" + (s.enabled ? "" : " off");
+        item.dataset.siteId = s.id;
+
+        const check = document.createElement("input");
+        check.type = "checkbox";
+        check.className = "app-toggle-check";
+        check.checked = Boolean(s.enabled);
+
+        const text = document.createElement("span");
+        text.className = "app-toggle-label";
+        text.textContent = s.name;
+
+        check.addEventListener("change", () => {
+          toggleSiteEnabled(s.id, check.checked);
+        });
+
+        item.appendChild(check);
+        item.appendChild(text);
+        parent.appendChild(item);
       }
     }
 
-    function toggleSiteEnabled(id) {
+    function toggleSiteEnabled(id, enabledState) {
       const idx = sites.findIndex(s => s.id === id);
       if (idx === -1) return;
-      sites[idx].enabled = !sites[idx].enabled;
+      sites[idx].enabled = typeof enabledState === "boolean"
+        ? enabledState
+        : !sites[idx].enabled;
       saveSites();
       renderChips();
     }
@@ -269,22 +303,21 @@
 
     function addRowForSite(site, index) {
       const row = document.createElement("div");
-      row.className = "site-row";
+      row.className = "app-form-row";
       row.dataset.index = index;
       row.innerHTML = `
-        <input type="text" class="mf-name" value="${site.name.replace(/"/g,'&quot;')}">
-        <input type="text" class="mf-url" value="${site.url.replace(/"/g,'&quot;')}">
-        <select class="mf-cat">
+        <input type="text" class="app-input mf-name" value="${site.name.replace(/"/g,'&quot;')}">
+        <input type="text" class="app-input mf-url" value="${site.url.replace(/"/g,'&quot;')}">
+        <select class="app-select mf-cat">
           <option value="videos"${site.category==="videos"?" selected":""}>Videos</option>
           <option value="photos"${site.category==="photos"?" selected":""}>Photos</option>
           <option value="public"${site.category==="public"?" selected":""}>Public</option>
           <option value="png"${site.category==="png"?" selected":""}>PNGs</option>
         </select>
-        <div class="site-row-actions">
-          <label class="small-check">
-            <input type="checkbox" class="mf-enabled"${site.enabled ? " checked" : ""}> on
-          </label>
-          <button class="remove">✕</button>
+        <div class="app-form-actions">
+          <button class="app-icon-btn remove" type="button" aria-label="Delete site" title="Delete site">
+            <img src="/assets/svg/icons/delete_fill.svg" alt="" width="14" height="14" aria-hidden="true">
+          </button>
         </div>
       `;
       row.querySelector("button.remove").onclick = () => {
@@ -376,7 +409,7 @@
     };
 
     btnSaveSites.onclick = () => {
-      const rows = [...sitesContainer.querySelectorAll(".site-row")];
+      const rows = [...sitesContainer.querySelectorAll(".app-form-row")];
       const updated = [];
       for (const row of rows) {
         const idx = Number(row.dataset.index);
@@ -384,11 +417,13 @@
         const name = row.querySelector(".mf-name").value.trim() || "Untitled";
         const url  = row.querySelector(".mf-url").value.trim();
         const cat  = row.querySelector(".mf-cat").value;
-        const enabled = row.querySelector(".mf-enabled").checked;
         if (!url) continue;
         updated.push({
           id: original.id || ("custom_"+Date.now()+"_"+Math.random().toString(16).slice(2)),
-          name, url, category: cat, enabled
+          name,
+          url,
+          category: cat,
+          enabled: typeof original.enabled === "boolean" ? original.enabled : true
         });
       }
       sites = updated;

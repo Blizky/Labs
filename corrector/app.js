@@ -4,8 +4,9 @@ const readingTime = document.getElementById("readingTime");
 const changeCount = document.getElementById("changeCount");
 const statusLabel = document.getElementById("status");
 const statusDot = document.getElementById("statusDot");
-const runEnBtn = document.getElementById("runEn");
-const runEsBtn = document.getElementById("runEs");
+const runCorrectBtn = document.getElementById("runCorrect");
+const langEnBtn = document.getElementById("langEn");
+const langEsBtn = document.getElementById("langEs");
 const clearBtn = document.getElementById("clear");
 const copyOutputBtn = document.getElementById("copyOutput");
 const saveMarkdownBtn = document.getElementById("saveMarkdown");
@@ -63,6 +64,8 @@ const EMOJI_REGEX = /[\p{Extended_Pictographic}\p{Emoji_Presentation}\uFE0F]/gu;
 
 let currentLanguage = null;
 let readingSpeed = DEFAULT_READING_SPEED;
+let selectedLanguage = "en";
+let languageSetManually = false;
 
 function setPlaceholderByOS() {
   const platform = navigator.platform || "";
@@ -293,7 +296,7 @@ function setCurrentLanguage(language) {
       languageLabel.textContent = "Language: Manual";
     } else {
       const label = languageLabels[language] || languageLabels.es;
-      languageLabel.textContent = `Language: ${label} (manual)`;
+      languageLabel.textContent = `Language: ${label}`;
     }
   }
   if (language === "en") {
@@ -303,10 +306,79 @@ function setCurrentLanguage(language) {
   }
 }
 
+function applyLanguageSelection(language, options = {}) {
+  const safeLanguage = language === "es" ? "es" : "en";
+  selectedLanguage = safeLanguage;
+  if (options.manual) languageSetManually = true;
+
+  if (langEnBtn) {
+    const enActive = safeLanguage === "en";
+    langEnBtn.classList.toggle("active", enActive);
+    langEnBtn.setAttribute("aria-pressed", String(enActive));
+  }
+  if (langEsBtn) {
+    const esActive = safeLanguage === "es";
+    langEsBtn.classList.toggle("active", esActive);
+    langEsBtn.setAttribute("aria-pressed", String(esActive));
+  }
+
+  setCurrentLanguage(safeLanguage);
+
+  if (options.auto) {
+    triggerAutoLanguageEffect(safeLanguage);
+  }
+}
+
+function triggerAutoLanguageEffect(language) {
+  const target = language === "es" ? langEsBtn : langEnBtn;
+  if (!target) return;
+  target.classList.remove("auto-picked");
+  void target.offsetWidth;
+  target.classList.add("auto-picked");
+  window.setTimeout(() => {
+    target.classList.remove("auto-picked");
+  }, 760);
+}
+
+function detectSuggestedLanguage(text) {
+  const sample = String(text || "").toLowerCase();
+  if (!sample.trim()) {
+    return { language: null, confidence: 0 };
+  }
+
+  const accentHits = (sample.match(/[áéíóúñü¿¡]/g) || []).length;
+  const tokens = sample.match(/[a-záéíóúñü']+/g) || [];
+  let esScore = accentHits * 3;
+  let enScore = 0;
+
+  const commonEs = new Set(["de", "la", "que", "el", "en", "por", "para", "con", "una", "del", "los", "las", "un", "se", "al"]);
+  const commonEn = new Set(["the", "and", "is", "of", "to", "for", "with", "that", "this", "from", "as", "by", "in", "on", "at"]);
+
+  for (const token of tokens) {
+    if (commonEs.has(token)) esScore += 1;
+    if (commonEn.has(token)) enScore += 1;
+  }
+
+  const total = esScore + enScore;
+  if (!total) return { language: null, confidence: 0 };
+
+  const language = esScore >= enScore ? "es" : "en";
+  const confidence = Math.abs(esScore - enScore) / total;
+  return { language, confidence };
+}
+
+function maybeApplySuggestedLanguage(text) {
+  const suggested = detectSuggestedLanguage(text);
+  if (!languageSetManually && suggested.language && suggested.confidence >= 0.18) {
+    if (suggested.language !== selectedLanguage) {
+      applyLanguageSelection(suggested.language, { auto: true });
+    }
+  }
+}
+
 function updateRunButtonsState() {
   const hasText = Boolean((input.textContent || "").trim());
-  runEnBtn.disabled = !hasText;
-  runEsBtn.disabled = !hasText;
+  runCorrectBtn.disabled = !hasText;
 }
 
 async function runCorrection(language) {
@@ -324,8 +396,7 @@ async function runCorrection(language) {
   setCurrentLanguage(language);
 
   setStatus("Correcting…", true);
-  runEnBtn.disabled = true;
-  runEsBtn.disabled = true;
+  runCorrectBtn.disabled = true;
 
   let ignoredRanges = [];
   let edits = [];
@@ -519,6 +590,58 @@ function looksLikeMarkdown(text) {
   ].some(pattern => pattern.test(sample));
 }
 
+function normalizePlainPaste(text) {
+  if (!text) return "";
+  return stripEmojis(text)
+    .replace(/\r\n?/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .split("\n\n")
+    .map(block => block.replace(/\n+/g, " ").replace(/[ \t]{2,}/g, " ").trim())
+    .filter(Boolean)
+    .join("\n\n")
+    .trim();
+}
+
+function htmlToRenderedParagraphText(html) {
+  if (!html) return "";
+  try {
+    const doc = new DOMParser().parseFromString(html, "text/html");
+    const blockTags = new Set([
+      "p", "div", "article", "section", "main", "aside", "header", "footer",
+      "h1", "h2", "h3", "h4", "h5", "h6", "li", "ul", "ol", "blockquote",
+      "pre", "table", "tr"
+    ]);
+
+    function walk(node) {
+      if (!node) return "";
+      if (node.nodeType === Node.TEXT_NODE) {
+        return (node.textContent || "").replace(/\s+/g, " ");
+      }
+      if (node.nodeType !== Node.ELEMENT_NODE) return "";
+
+      const el = node;
+      const tag = el.tagName.toLowerCase();
+      if (tag === "br") return "\n";
+
+      let chunk = "";
+      el.childNodes.forEach(child => {
+        chunk += walk(child);
+      });
+
+      if (blockTags.has(tag)) {
+        const trimmed = chunk.trim();
+        return trimmed ? `${trimmed}\n\n` : "";
+      }
+      return chunk;
+    }
+
+    const rendered = walk(doc.body) || doc.body?.innerText || doc.body?.textContent || "";
+    return normalizePlainPaste(rendered);
+  } catch (error) {
+    return "";
+  }
+}
+
 function insertTextAtCursor(text) {
   const safeText = stripEmojis(text);
   const selection = window.getSelection();
@@ -557,24 +680,27 @@ function openIgnoredModal() {
   if (readingSpeedInput) {
     readingSpeedInput.value = readingSpeed;
   }
-  ignoredModal.classList.add("open");
+  ignoredModal.classList.add("show");
   ignoredModal.setAttribute("aria-hidden", "false");
 }
 
 function closeIgnoredModal() {
-  ignoredModal.classList.remove("open");
+  ignoredModal.classList.remove("show");
   ignoredModal.setAttribute("aria-hidden", "true");
 }
 
 input.addEventListener("input", () => {
   updateWordCount();
   changeCount.textContent = `${input.querySelectorAll(".change").length} changes`;
+  maybeApplySuggestedLanguage(input.textContent || "");
   updateRunButtonsState();
 });
 
 input.addEventListener("paste", (event) => {
   const plain = event.clipboardData?.getData("text/plain");
   const html = event.clipboardData?.getData("text/html");
+  const normalizedPlain = normalizePlainPaste(plain || "");
+
   if (plain && looksLikeMarkdown(plain)) {
     event.preventDefault();
     insertTextAtCursor(plain);
@@ -584,13 +710,34 @@ input.addEventListener("paste", (event) => {
   if (html) {
     event.preventDefault();
     const markdown = htmlToMarkdown(html);
-    insertTextAtCursor(markdown);
+    const htmlParagraphText = htmlToRenderedParagraphText(html);
+    let preferred = markdown;
+
+    // Some copied web selections collapse paragraphs during HTML conversion.
+    // If rendered HTML/plain text clearly has paragraph breaks and markdown lost them, use paragraph text.
+    if (normalizedPlain) {
+      const plainBlocks = normalizedPlain.split(/\n\n/).length;
+      const markdownBlocks = markdown.split(/\n\n/).length;
+      if (plainBlocks > 1 && markdownBlocks <= 1) {
+        preferred = normalizedPlain;
+      }
+    }
+
+    if (htmlParagraphText) {
+      const htmlBlocks = htmlParagraphText.split(/\n\n/).length;
+      const markdownBlocks = markdown.split(/\n\n/).length;
+      if (htmlBlocks > 1 && markdownBlocks <= 1) {
+        preferred = htmlParagraphText;
+      }
+    }
+
+    insertTextAtCursor(preferred || htmlParagraphText || normalizedPlain || plain || "");
     input.dispatchEvent(new Event("input", { bubbles: true }));
     return;
   }
   if (plain) {
     event.preventDefault();
-    insertTextAtCursor(plain);
+    insertTextAtCursor(normalizedPlain || plain);
     input.dispatchEvent(new Event("input", { bubbles: true }));
   }
 });
@@ -631,14 +778,20 @@ input.addEventListener("click", (event) => {
   changeCount.textContent = `${input.querySelectorAll(".change").length} cambios`;
 });
 
-runEnBtn.addEventListener("click", () => runCorrection("en"));
-runEsBtn.addEventListener("click", () => runCorrection("es"));
+if (langEnBtn) {
+  langEnBtn.addEventListener("click", () => applyLanguageSelection("en", { manual: true }));
+}
+if (langEsBtn) {
+  langEsBtn.addEventListener("click", () => applyLanguageSelection("es", { manual: true }));
+}
+runCorrectBtn.addEventListener("click", () => runCorrection(selectedLanguage));
 
 clearBtn.addEventListener("click", () => {
   input.textContent = "";
   changeCount.textContent = "0 changes";
   updateWordCount();
-  setCurrentLanguage(null);
+  languageSetManually = false;
+  applyLanguageSelection("en");
   updateRunButtonsState();
   setStatus("Ready", false);
 });
@@ -691,7 +844,7 @@ ignoredModal.addEventListener("click", (event) => {
 });
 
 updateWordCount();
-setCurrentLanguage(null);
+applyLanguageSelection("en");
 setPlaceholderByOS();
 updateRunButtonsState();
 

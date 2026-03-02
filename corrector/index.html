@@ -5,64 +5,94 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Corrector — Blizlab</title>
   <link rel="stylesheet" href="../assets/css/global.css" />
+  <link rel="stylesheet" href="../assets/css/essentials.css" />
   <link rel="stylesheet" href="style.css" />
   <script src="../assets/components.js" defer></script>
+  <script>
+    if (new URLSearchParams(window.location.search).get("embed") === "1") {
+      document.documentElement.classList.add("embed-mode");
+    }
+  </script>
+  <style>
+    html.embed-mode app-header,
+    html.embed-mode app-footer {
+      display: none !important;
+    }
+    html.embed-mode,
+    html.embed-mode body {
+      background: #E4E8EB !important;
+      background-image: none !important;
+      color: #24292d;
+    }
+    html.embed-mode .page-main {
+      background: transparent !important;
+    }
+  </style>
 </head>
 <body>
   <app-header layout="compact" app-title="Corrector"></app-header>
-  <div class="status-pill" aria-live="polite">
-    <span class="pill"><span class="status-dot" id="statusDot"></span><span id="status">Ready</span></span>
-  </div>
 
   <main class="page-main">
-    <section class="grid">
-      <article class="panel">
-        <header class="panel-header">
-          <div class="panel-title">
-            <p class="tool-subtitle panel-subtitle">Polish copy with fast EN or ES correction and inline review.</p>
-          </div>
-          <div class="toolbar">
-            <div class="toolbar-buttons">
-              <button id="runEn" class="primary" type="button">Correct EN</button>
-              <button id="runEs" class="primary" type="button">Correct ES</button>
-              <button id="clear" type="button">Clear</button>
-              <button id="copyOutput" class="primary" type="button">Copy</button>
-              <button id="saveMarkdown" class="primary" type="button">Save</button>
-              <button id="openOptions" class="menu-button" type="button" aria-label="Open options">
-                <span></span>
-                <span></span>
-                <span></span>
-              </button>
+    <section class="app-shell corrector-shell">
+      <section class="app-search-card controls-card">
+        <div class="controls-row">
+          <div class="toolbar-buttons">
+            <button id="runCorrect" class="app-btn" type="button">
+              <img class="icon-img" src="/assets/svg/icons/check_2_fill.svg" alt="" width="14" height="14" aria-hidden="true">
+              <span>Correct</span>
+            </button>
+            <div class="lang-segment" role="group" aria-label="Correction language">
+              <button id="langEn" class="lang-segment-btn active" type="button" aria-pressed="true">EN</button>
+              <button id="langEs" class="lang-segment-btn" type="button" aria-pressed="false">ES</button>
             </div>
-            <div class="tool-subtitle toolbar-subtitle" id="toolSubtitle"></div>
+            <button id="clear" class="app-btn app-btn--ghost" type="button">Clear</button>
+            <button id="copyOutput" class="app-btn" type="button">Copy</button>
+            <button id="saveMarkdown" class="app-btn" type="button">Save</button>
+            <button id="openOptions" class="menu-icon-button" type="button" aria-label="Open options">
+              <img class="icon-img" src="/assets/svg/icons/menu_line.svg" alt="" width="16" height="16" aria-hidden="true">
+            </button>
           </div>
-        </header>
-        <div class="stack">
-          <div id="input" class="editor-input" contenteditable="true" spellcheck="false" data-placeholder="Paste your text here..."></div>
+          <div class="status-light-wrap" aria-live="polite" aria-label="Corrector status">
+            <span id="status" class="status-text">Ready</span>
+            <span class="status-dot" id="statusDot" title="Status"></span>
+          </div>
         </div>
-        <div class="meta">
-          <span id="wordCount">0 words</span>
-          <span id="readingTime">0 min read</span>
-          <span id="changeCount">0 changes</span>
-          <span id="languageLabel">Language: Manual</span>
-          <span>Red: changes. Orange: suspicious. Green: reverted.</span>
-        </div>
-      </article>
+        <div class="app-search-hint">Use EN/ES correction, then click any highlighted word to revert or restore all matches.</div>
+      </section>
+
+      <div class="stack">
+        <div id="input" class="editor-input" contenteditable="true" spellcheck="false" data-placeholder="Paste your text here..."></div>
+      </div>
+
+      <div class="app-footer-row meta">
+        <span id="wordCount">0 words</span>
+        <span id="readingTime">0 min read</span>
+        <span id="changeCount">0 changes</span>
+        <span id="languageLabel">Language: Manual</span>
+        <span>Red: changes. Orange: suspicious. Green: reverted.</span>
+      </div>
     </section>
   </main>
 
-  <div class="modal" id="ignoredModal" aria-hidden="true">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="ignoredTitle">
-      <h3 id="ignoredTitle">Options</h3>
-      <p>One word or phrase per line. These will be ignored in future corrections.</p>
-      <textarea id="ignoredList" rows="6" placeholder="Ex: Loeb"></textarea>
-      <label class="field">
-        <span>Reading speed (words per minute)</span>
-        <input id="readingSpeed" type="number" min="100" max="250" step="5" />
-      </label>
-      <div class="modal-actions">
-        <button id="saveIgnored" class="primary" type="button">Save</button>
-        <button id="closeIgnored" type="button">Close</button>
+  <div class="app-modal-backdrop" id="ignoredModal" aria-hidden="true">
+    <div class="app-modal modal-card corrector-options-dialog" role="dialog" aria-modal="true" aria-labelledby="ignoredTitle">
+      <div class="app-modal-head">
+        <h3 class="app-modal-title" id="ignoredTitle">Options</h3>
+        <button id="closeIgnored" class="app-btn app-btn--small" type="button">Close</button>
+      </div>
+      <div class="app-modal-body corrector-modal-body">
+        <p>One word or phrase per line. These will be ignored in future corrections.</p>
+        <textarea id="ignoredList" rows="6" placeholder="Ex: Loeb"></textarea>
+        <label class="field">
+          <span>Reading speed (words per minute)</span>
+          <input id="readingSpeed" type="number" min="100" max="250" step="5" />
+        </label>
+      </div>
+      <div class="app-modal-foot">
+        <div class="app-modal-foot-buttons">
+          <button id="saveIgnored" class="app-btn app-btn--small" type="button">Save</button>
+        </div>
+        <span>Ignored terms are saved locally on this browser.</span>
       </div>
     </div>
   </div>
