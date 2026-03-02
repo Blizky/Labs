@@ -94,6 +94,21 @@ class AppHeader extends HTMLElement {
   min-width: 0;
 }
 
+        .brand-link {
+          display: inline-flex;
+          align-items: center;
+          line-height: 1;
+          text-decoration: none;
+        }
+
+        .brand-prefix {
+          color: ${BRAND_YELLOW};
+          font-size: 2rem;
+          font-weight: 700;
+          letter-spacing: 0.02em;
+          margin-right: 6px;
+        }
+
         .brand-logo {
           width: ${LOGO_WIDTH};
           height: auto;
@@ -315,7 +330,8 @@ class AppHeader extends HTMLElement {
 
       <header>
         <div class="brand-section">
-          <a href="/" title="Go to Homepage" style="display:block; line-height:0;">
+          <a href="/" title="Go to Homepage" class="brand-link">
+            <span class="brand-prefix" aria-hidden="true">labs.</span>
             <img src="/assets/svg/blizlab_logo_shade.svg" alt="Blizlab" class="brand-logo">
           </a>
           <div class="brand-tagline">

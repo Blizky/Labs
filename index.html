@@ -77,6 +77,145 @@
       white-space: nowrap;
     }
 
+    .topbar-menu-wrap {
+      position: relative;
+      flex: none;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .topbar-menu-btn {
+      width: 36px;
+      height: 36px;
+      border: 0;
+      border-radius: 8px;
+      background: transparent;
+      padding: 0;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background-color 0.15s ease;
+    }
+
+    .topbar-menu-btn:hover {
+      background: rgba(228, 232, 235, 0.16);
+    }
+
+    .topbar-menu-btn:focus-visible {
+      outline: 2px solid rgba(0, 153, 204, 0.7);
+      outline-offset: 2px;
+    }
+
+    .topbar-menu-btn img {
+      width: 20px;
+      height: 20px;
+      display: block;
+      opacity: 0.95;
+      filter: brightness(0) saturate(100%) invert(89%) sepia(7%) saturate(202%) hue-rotate(172deg) brightness(100%) contrast(93%);
+    }
+
+    .topbar-menu-panel {
+      position: absolute;
+      top: calc(100% + 10px);
+      right: 0;
+      width: min(340px, calc(100vw - 20px));
+      background: var(--charcoal-blue);
+      color: var(--platinum);
+      border-radius: 12px;
+      border: 1px solid rgba(210, 215, 220, 0.3);
+      box-shadow: 0 18px 40px rgba(24, 29, 33, 0.35);
+      padding: 10px 12px 12px;
+      z-index: 220;
+    }
+
+    .topbar-menu-panel[hidden] {
+      display: none;
+    }
+
+    .menu-panel-title {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin: 0 0 8px;
+      font-size: 0.86rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #FFCC33;
+      font-weight: 700;
+    }
+
+    .menu-panel-title-icon {
+      width: 14px;
+      height: 14px;
+      display: block;
+      flex: none;
+    }
+
+    .menu-panel-links {
+      display: grid;
+      gap: 4px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .menu-panel-links a {
+      display: block;
+      text-decoration: none;
+      color: var(--platinum);
+      font-size: 0.93rem;
+      font-weight: 600;
+      padding: 7px 8px;
+      border-radius: 7px;
+      transition: background-color 0.14s ease;
+    }
+
+    .menu-panel-links a:hover {
+      background: rgba(228, 232, 235, 0.14);
+    }
+
+    .menu-panel-divider {
+      height: 1px;
+      margin: 10px 0 9px;
+      background: rgba(210, 215, 220, 0.28);
+      border: 0;
+    }
+
+    .menu-panel-meta {
+      font-size: 0.84rem;
+      color: var(--alabaster-grey);
+      display: grid;
+      gap: 5px;
+    }
+
+    .menu-panel-meta p {
+      margin: 0;
+    }
+
+    .menu-panel-meta a {
+      color: #FFCC33;
+      text-decoration: none;
+    }
+
+    .menu-panel-meta-icon {
+      width: 14px;
+      height: 14px;
+      vertical-align: -2px;
+      margin-right: 5px;
+    }
+
+    .menu-panel-meta a:hover {
+      text-decoration: underline;
+    }
+
+    .menu-panel-made {
+      margin-top: 4px;
+      text-align: right;
+      color: #f3f6f8;
+      font-weight: 700;
+    }
+
     .topbar-features::-webkit-scrollbar {
       display: none;
     }
@@ -101,8 +240,8 @@
     }
 
     .feature-link.active {
-      color: #ffdd75;
-      border-bottom-color: #ffcc33;
+      color: #FFCC33;
+      border-bottom-color: #FFCC33;
     }
 
     .shell-main {
@@ -166,6 +305,25 @@
       <button class="feature-link" data-app-nav="corrector" type="button">Corrector</button>
       <button class="feature-link" data-app-nav="calendar" type="button">Calendar</button>
     </nav>
+    <div class="topbar-menu-wrap">
+      <button class="topbar-menu-btn" id="topbarMenuButton" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="topbarMenuPanel" aria-label="Open more apps menu">
+        <img src="assets/svg/icons/menu_fill.svg" alt="" width="20" height="20" aria-hidden="true">
+      </button>
+      <div class="topbar-menu-panel" id="topbarMenuPanel" role="menu" hidden>
+        <p class="menu-panel-title"><img class="menu-panel-title-icon" src="assets/svg/blizlab-bolt.svg" alt="" width="14" height="14" aria-hidden="true">More apps</p>
+        <ul class="menu-panel-links">
+          <li><a href="https://blizlab.com/" target="_blank" rel="noreferrer noopener">Blizlab - Multiplane image editor</a></li>
+          <li><a href="https://webprompter.app/" target="_blank" rel="noreferrer noopener">WebPrompter - Free online teleprompter</a></li>
+          <li><a href="https://pipdown.com/" target="_blank" rel="noreferrer noopener">Pipdown - Markdown notes companion</a></li>
+        </ul>
+        <hr class="menu-panel-divider">
+        <div class="menu-panel-meta">
+          <p>Support Blizlab: <a href="https://ko-fi.com/blizky" target="_blank" rel="noreferrer noopener"><img class="menu-panel-meta-icon" src="assets/svg/icons/ko-fi.svg" alt="" width="14" height="14" aria-hidden="true">ko-fi.com/blizky</a></p>
+          <p>Send feedback to <a href="mailto:alex@blizlab.com">alex@blizlab.com</a></p>
+          <p class="menu-panel-made">Made by Alex with ❤️</p>
+        </div>
+      </div>
+    </div>
   </header>
 
   <main class="shell-main">
@@ -185,6 +343,8 @@
 
     const appFrame = document.getElementById("appFrame");
     const navButtons = Array.from(document.querySelectorAll("[data-app-nav]"));
+    const topbarMenuButton = document.getElementById("topbarMenuButton");
+    const topbarMenuPanel = document.getElementById("topbarMenuPanel");
 
     function normalizeApp(value) {
       const key = (value || "").toLowerCase();
@@ -235,6 +395,36 @@
       button.addEventListener("click", () => {
         goToApp(button.dataset.appNav);
       });
+    });
+
+    function closeTopbarMenu() {
+      topbarMenuPanel.hidden = true;
+      topbarMenuButton.setAttribute("aria-expanded", "false");
+    }
+
+    function openTopbarMenu() {
+      topbarMenuPanel.hidden = false;
+      topbarMenuButton.setAttribute("aria-expanded", "true");
+    }
+
+    topbarMenuButton.addEventListener("click", () => {
+      if (topbarMenuPanel.hidden) {
+        openTopbarMenu();
+      } else {
+        closeTopbarMenu();
+      }
+    });
+
+    document.addEventListener("click", (event) => {
+      if (!topbarMenuPanel.hidden && !event.target.closest(".topbar-menu-wrap")) {
+        closeTopbarMenu();
+      }
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        closeTopbarMenu();
+      }
     });
 
     window.addEventListener("hashchange", applyRouteFromHash);
