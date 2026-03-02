@@ -33,10 +33,10 @@ footer {
   margin-bottom: 18px;
   padding: 10px 12px;
   border-radius: 10px;
-  background: #FFF5CF;
-  border: 1px solid #E2C45A;
+  background: #24292d;
+  border: 1px solid #FFCC33;
   font-size: 0.85rem;
-  color: #7b5a00;
+  color: #FFCC33;
   display: none;
   align-items: center;
   justify-content: space-between;
@@ -55,12 +55,21 @@ footer {
 
 .popup-strip button {
   border-radius: 999px;
-  border: 1px solid currentColor;
+  border: 1px solid #FFCC33;
   background: transparent;
-  color: inherit;
+  color: #FFCC33;
   padding: 4px 10px;
   font-size: 0.8rem;
   cursor: pointer;
+}
+
+.popup-strip button:hover {
+  background: rgba(255, 204, 51, 0.14);
+}
+
+.popup-strip button:focus-visible {
+  outline: 2px solid #0099CC;
+  outline-offset: 2px;
 }
 
 /* Legacy card wrapper is no longer used in OctoFind */

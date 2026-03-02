@@ -59,6 +59,14 @@
       cursor: default;
     }
 
+    .app-title-prefix {
+      color: var(--yellow);
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      margin-right: 6px;
+    }
+
     .app-title img {
       height: 32px;
       width: auto;
@@ -278,6 +286,10 @@
         height: 28px;
       }
 
+      .app-title-prefix {
+        font-size: 1.3rem;
+      }
+
       .topbar-features {
         gap: 10px;
       }
@@ -296,6 +308,7 @@
 <body>
   <header class="app-topbar">
     <h1 class="app-title">
+      <span class="app-title-prefix" aria-hidden="true">labs.</span>
       <img src="assets/svg/blizlab_logo_flat.svg" alt="Blizlab Labs">
     </h1>
     <nav class="topbar-features" aria-label="Labs features">

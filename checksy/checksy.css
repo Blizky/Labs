@@ -347,14 +347,14 @@ footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: #fef3c7;
-  border: 1px solid #facc15;
-  font-size: 0.8rem;
-  color: #92400e;
-  margin-bottom: 12px;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #24292d;
+  border: 1px solid #FFCC33;
+  font-size: 0.85rem;
+  color: #FFCC33;
+  margin-bottom: 18px;
 }
 
 .popup-strip-main {
@@ -365,17 +365,27 @@ footer {
 }
 
 .popup-strip .icon {
-  font-size: 1rem;
+  font-size: 1.1rem;
 }
 
 .popup-strip button {
   border-radius: 999px;
-  border: none;
-  background: #fef9c3;
+  border: 1px solid #FFCC33;
+  background: transparent;
+  color: #FFCC33;
   padding: 4px 10px;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   cursor: pointer;
   white-space: nowrap;
+}
+
+.popup-strip button:hover {
+  background: rgba(255, 204, 51, 0.14);
+}
+
+.popup-strip button:focus-visible {
+  outline: 2px solid #0099CC;
+  outline-offset: 2px;
 }
 
 /* ----------------------------------------------------------

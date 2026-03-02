@@ -103,7 +103,7 @@ class AppHeader extends HTMLElement {
 
         .brand-prefix {
           color: ${BRAND_YELLOW};
-          font-size: 2rem;
+          font-size: 1.5rem;
           font-weight: 700;
           letter-spacing: 0.02em;
           margin-right: 6px;
