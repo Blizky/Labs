@@ -190,6 +190,28 @@
       border: 0;
     }
 
+    .menu-panel-actions {
+      display: flex;
+      margin-bottom: 8px;
+    }
+
+    .menu-panel-action-btn {
+      width: 100%;
+      border: 1px solid #007aa3;
+      background: #0099cc;
+      color: #ffffff;
+      border-radius: 8px;
+      padding: 7px 10px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .menu-panel-action-btn:hover {
+      background: #007aa3;
+      border-color: #00688a;
+    }
+
     .menu-panel-meta {
       font-size: 0.84rem;
       color: var(--alabaster-grey);
@@ -330,6 +352,9 @@
           <li><a href="https://pipdown.com/" target="_blank" rel="noreferrer noopener">Pipdown - Markdown notes companion</a></li>
         </ul>
         <hr class="menu-panel-divider">
+        <div class="menu-panel-actions">
+          <button class="menu-panel-action-btn" id="topbarClearCache" type="button">Clear cache</button>
+        </div>
         <div class="menu-panel-meta">
           <p>Support Blizlab: <a href="https://ko-fi.com/blizky" target="_blank" rel="noreferrer noopener"><img class="menu-panel-meta-icon" src="assets/svg/icons/ko-fi.svg" alt="" width="14" height="14" aria-hidden="true">ko-fi.com/blizky</a></p>
           <p>Send feedback to <a href="mailto:alex@blizlab.com">alex@blizlab.com</a></p>
@@ -358,6 +383,8 @@
     const navButtons = Array.from(document.querySelectorAll("[data-app-nav]"));
     const topbarMenuButton = document.getElementById("topbarMenuButton");
     const topbarMenuPanel = document.getElementById("topbarMenuPanel");
+    const topbarClearCache = document.getElementById("topbarClearCache");
+    const LABS_CACHE_KEY_PREFIXES = ["octofind-", "checksy-", "chrono-", "blizlab_corrector_"];
 
     function normalizeApp(value) {
       const key = (value || "").toLowerCase();
@@ -420,6 +447,18 @@
       topbarMenuButton.setAttribute("aria-expanded", "true");
     }
 
+    function clearLabsCache() {
+      const keysToDelete = new Set();
+      for (let i = 0; i < localStorage.length; i += 1) {
+        const key = localStorage.key(i);
+        if (!key) continue;
+        if (LABS_CACHE_KEY_PREFIXES.some((prefix) => key.startsWith(prefix))) {
+          keysToDelete.add(key);
+        }
+      }
+      keysToDelete.forEach((key) => localStorage.removeItem(key));
+    }
+
     topbarMenuButton.addEventListener("click", () => {
       if (topbarMenuPanel.hidden) {
         openTopbarMenu();
@@ -438,6 +477,12 @@
       if (event.key === "Escape") {
         closeTopbarMenu();
       }
+    });
+
+    topbarClearCache.addEventListener("click", () => {
+      clearLabsCache();
+      closeTopbarMenu();
+      window.alert("Cache cleared for Labs apps. Reload open apps to refresh.");
     });
 
     window.addEventListener("hashchange", applyRouteFromHash);

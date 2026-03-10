@@ -380,4 +380,6 @@ updateEnabledLabel();
 
 if (localStorage.getItem(KEY_POPUP) === "1") {
   popupStrip.style.display = "none";
+} else {
+  popupStrip.style.display = "flex";
 }

@@ -75,21 +75,13 @@ body {
   transform: scale(0.98);
 }
 
-.btn-secondary {
+.chrono-popout-btn {
   width: 100%;
+  justify-content: center;
   margin-top: 10px;
   padding: 10px 14px;
   font-size: 0.95rem;
   font-weight: 700;
-  border: 1px solid rgba(0, 0, 0, 0.16);
-  border-radius: 12px;
-  background: #f4fbff;
-  color: #115a74;
-  cursor: pointer;
-}
-
-.btn-secondary:hover {
-  background: #e2f3ff;
 }
 
 footer {
@@ -132,7 +124,7 @@ footer {
 body.popup-mode app-header,
 body.popup-mode app-footer,
 body.popup-mode .tool-header,
-body.popup-mode .btn-secondary {
+body.popup-mode .chrono-popout-btn {
   display: none !important;
 }
 

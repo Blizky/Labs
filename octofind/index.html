@@ -37,14 +37,14 @@
   <app-header layout="compact" app-title="OctoFind"></app-header>
 
   <main class="page-main">
-    <div class="popup-strip" id="popupStrip">
-      <div class="popup-strip-main">
-        <span class="icon">⚠️</span>
+    <div class="app-warning-bar" id="popupStrip">
+      <div class="app-warning-bar-main">
+        <span class="app-warning-bar-icon" aria-hidden="true">⚠️</span>
         <span id="popupText">
           To open multiple sites at once, please allow pop-ups for this page.
         </span>
       </div>
-      <button id="popupDismiss">Got it</button>
+      <button class="app-btn app-btn--small app-btn--primary app-warning-bar-action" id="popupDismiss" type="button">Got it</button>
     </div>
 
     <section class="app-shell">
