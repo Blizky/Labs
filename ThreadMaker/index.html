@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ThreadMaker</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div class="topbar-inner">
+        <div class="brand">
+          <span>ThreadMaker</span>
+          <img
+            class="brand-bolt"
+            src="./assets/svg/blizlab-bolt.svg"
+            alt=""
+            width="12"
+            height="12"
+            aria-hidden="true"
+          />
+        </div>
+        <details class="more-menu" id="more-menu">
+          <summary class="more-trigger">
+            <img
+              class="icon-img"
+              src="./assets/icons/menu_fill.svg"
+              alt=""
+              width="28"
+              height="28"
+              aria-hidden="true"
+            />
+          </summary>
+          <form class="menu-panel" id="thread-form">
+            <div class="field-group">
+              <label for="platform-limit">Characters per post</label>
+              <select id="platform-limit" name="platform-limit" class="menu-compact-control">
+                <option value="280">X / Twitter · 280</option>
+                <option value="300">Bluesky · 300</option>
+                <option value="500">Long-form · 500</option>
+                <option value="custom">Custom</option>
+              </select>
+              <input
+                id="custom-limit"
+                name="custom-limit"
+                type="number"
+                min="50"
+                max="1000"
+                step="1"
+                value="280"
+                class="menu-compact-control"
+                aria-label="Custom character limit"
+                hidden
+              />
+            </div>
+
+            <div class="field-group menu-inline-field">
+              <label for="split-mode">Split mode</label>
+              <select id="split-mode" name="split-mode" class="menu-compact-control">
+                <option value="compact" selected>Compact</option>
+                <option value="paragraph">Paragraph</option>
+              </select>
+            </div>
+
+            <label class="toggle-row" for="include-numbering">
+              <div>
+                <span class="toggle-title">Number posts</span>
+              </div>
+              <span class="toggle-control">
+                <input id="include-numbering" name="include-numbering" type="checkbox" checked />
+                <span class="toggle-icon" aria-hidden="true"></span>
+              </span>
+            </label>
+
+            <label class="toggle-row" for="theme-toggle">
+              <div>
+                <span class="toggle-title">Dark / light</span>
+              </div>
+              <span class="toggle-control">
+                <input id="theme-toggle" name="theme-toggle" type="checkbox" />
+                <span class="toggle-icon" aria-hidden="true"></span>
+              </span>
+            </label>
+
+            <div class="menu-actions">
+              <button id="correct-english" class="menu-text-action" type="button">
+                Correct English
+              </button>
+              <button id="correct-spanish" class="menu-text-action" type="button">
+                Correct Spanish
+              </button>
+            </div>
+
+            <div class="menu-divider" aria-hidden="true"></div>
+
+            <div class="menu-support">
+              <p class="menu-support-title">
+                <span>Give if you’re able</span>
+                <img
+                  class="menu-support-icon"
+                  src="./assets/icons/hand_heart_fill.svg"
+                  alt=""
+                  width="16"
+                  height="16"
+                  aria-hidden="true"
+                />
+              </p>
+              <a
+                class="menu-support-link"
+                href="https://ko-fi.com/blizky"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <img
+                  class="menu-support-link-icon"
+                  src="./assets/svg/ko-fi.svg"
+                  alt=""
+                  width="16"
+                  height="16"
+                  aria-hidden="true"
+                />
+                ko-fi.com/blizky
+              </a>
+              <a
+                class="menu-support-link"
+                href="https://paypal.me/blizky"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <img
+                  class="menu-support-link-icon"
+                  src="./assets/svg/paypal_fill.svg"
+                  alt=""
+                  width="16"
+                  height="16"
+                  aria-hidden="true"
+                />
+                paypal.me/blizky
+              </a>
+            </div>
+
+            <p class="menu-signoff">
+              Made by Alex Blizky with
+              <img
+                class="menu-signoff-heart"
+                src="./assets/icons/heart_fill.svg"
+                alt=""
+                width="16"
+                height="16"
+                aria-hidden="true"
+              />
+            </p>
+          </form>
+        </details>
+      </div>
+    </header>
+
+    <main class="app-shell">
+      <section class="input-section">
+        <div class="composer-card">
+          <div class="textarea-shell">
+            <div
+              id="source-text"
+              name="source-text"
+              class="editor-input"
+              contenteditable="true"
+              spellcheck="false"
+              role="textbox"
+              aria-multiline="true"
+              data-placeholder="Enter text here..."
+            ></div>
+          </div>
+          <div class="panel-header">
+            <button class="editor-status" id="correction-status" type="button"></button>
+            <div class="panel-actions">
+              <p class="source-char-count" id="source-char-count">0 chars</p>
+              <button id="paste-text" class="panel-icon-button paste-button" type="button" aria-label="Paste" title="Paste">
+                <img
+                  class="icon-img panel-icon"
+                  src="./assets/icons/paste_fill.svg"
+                  alt=""
+                  width="28"
+                  height="28"
+                  aria-hidden="true"
+                />
+                <span class="panel-button-label">Paste</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="hashtags-section">
+        <div class="field-group">
+          <input
+            id="hashtags"
+            name="hashtags"
+            type="text"
+            placeholder="Enter hashtags here..."
+            autocomplete="off"
+          />
+        </div>
+      </section>
+
+      <section class="results-section">
+        <div class="message-banner" id="message-banner" hidden></div>
+        <div class="results-list empty" id="results-list">
+          <div class="empty-state"></div>
+        </div>
+      </section>
+    </main>
+
+    <template id="post-template">
+      <article class="post-card">
+        <pre class="post-body"></pre>
+        <div class="panel-header post-header">
+          <span class="post-label"></span>
+          <div class="panel-actions">
+            <p class="post-char-count"></p>
+            <button type="button" class="panel-icon-button copy-button" aria-label="Copy post" title="Copy post">
+              <img
+                class="icon-img panel-icon"
+                src="./assets/icons/clipboard_line.svg"
+                alt=""
+                width="28"
+                height="28"
+                aria-hidden="true"
+              />
+              <span class="panel-button-label">Copy</span>
+            </button>
+          </div>
+        </div>
+      </article>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
