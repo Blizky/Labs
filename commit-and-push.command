@@ -9,6 +9,7 @@ if [[ ! -d ".git" ]]; then
 fi
 
 MESSAGE="${*:-Update site files}"
+CURRENT_BRANCH="$(git branch --show-current)"
 
 git add -A
 
@@ -20,13 +21,14 @@ fi
 
 if git rev-parse --abbrev-ref --symbolic-full-name '@{u}' >/dev/null 2>&1; then
   if [[ "$(git rev-list --count '@{u}'..HEAD)" -eq 0 ]]; then
-    echo "Nothing to push."
+    CURRENT_HASH="$(git rev-parse --short HEAD)"
+    echo "Already synced: ${CURRENT_BRANCH} at ${CURRENT_HASH}"
     exit 0
   fi
   git push
 else
-  CURRENT_BRANCH="$(git branch --show-current)"
   git push -u origin "$CURRENT_BRANCH"
 fi
 
-echo "Done: committed and pushed."
+CURRENT_HASH="$(git rev-parse --short HEAD)"
+echo "Done: ${CURRENT_BRANCH} pushed at ${CURRENT_HASH}"
