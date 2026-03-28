@@ -45,7 +45,7 @@
       justify-content: space-between;
       gap: 20px;
       padding: 0 20px;
-      background: var(--charcoal-blue);
+      background: #2f353a;
       z-index: 120;
       flex: none;
     }
@@ -116,8 +116,8 @@
     }
 
     .topbar-menu-btn img {
-      width: 20px;
-      height: 20px;
+      width: 24px;
+      height: 24px;
       display: block;
       opacity: 0.95;
       filter: brightness(0) saturate(100%) invert(89%) sepia(7%) saturate(202%) hue-rotate(172deg) brightness(100%) contrast(93%);
@@ -127,7 +127,7 @@
       position: absolute;
       top: calc(100% + 10px);
       right: 0;
-      width: min(340px, calc(100vw - 20px));
+      width: min(280px, calc(100vw - 20px));
       background: var(--charcoal-blue);
       color: var(--platinum);
       border-radius: 12px;
@@ -168,19 +168,36 @@
       list-style: none;
     }
 
-    .menu-panel-links a {
+    .menu-panel-links a,
+    .menu-panel-links button {
       display: block;
+      width: 100%;
+      border: 0;
+      background: transparent;
       text-decoration: none;
+      text-align: left;
       color: var(--platinum);
+      font: inherit;
       font-size: 0.93rem;
       font-weight: 600;
       padding: 7px 8px;
       border-radius: 7px;
-      transition: background-color 0.14s ease;
+      cursor: pointer;
+      transition: background-color 0.14s ease, color 0.14s ease;
     }
 
-    .menu-panel-links a:hover {
+    .menu-panel-links a:hover,
+    .menu-panel-links button:hover,
+    .menu-panel-links button.active {
       background: rgba(228, 232, 235, 0.14);
+    }
+
+    .menu-panel-links button.active {
+      color: var(--yellow);
+    }
+
+    .menu-panel-apps {
+      display: none;
     }
 
     .menu-panel-divider {
@@ -279,12 +296,147 @@
       max-width: none;
       margin: 0;
       padding: 0;
-      flex-grow: 1;
-      display: flex;
-      flex-direction: column;
+      flex: 1 1 auto;
       min-height: 0;
       height: calc(100vh - 60px);
+      display: grid;
+      grid-template-columns: 280px minmax(0, 1fr);
       gap: 0;
+      background: var(--platinum);
+    }
+
+    .labs-sidebar {
+      min-height: 0;
+      padding: 22px 18px 24px;
+      background: #2f353a;
+      color: var(--platinum);
+      border-right: 1px solid rgba(210, 215, 220, 0.22);
+      overflow-y: auto;
+    }
+
+    .labs-sidebar-title {
+      margin: 0 0 4px;
+      font-size: 0.84rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--yellow);
+    }
+
+    .labs-sidebar-copy {
+      margin: 0 0 16px;
+      font-size: 0.92rem;
+      line-height: 1.5;
+      color: var(--alabaster-grey);
+    }
+
+    .labs-sidebar-nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .labs-sidebar-link {
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--platinum);
+      font: inherit;
+      text-align: left;
+      padding: 9px 12px;
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease;
+      display: grid;
+      gap: 2px;
+    }
+
+    .labs-sidebar-link:hover {
+      background: rgba(228, 232, 235, 0.12);
+    }
+
+    .labs-sidebar-link.active {
+      background: rgba(228, 232, 235, 0.16);
+      color: var(--platinum);
+    }
+
+    .labs-sidebar-link.active .labs-sidebar-link-title {
+      color: #0099cc;
+    }
+
+    .labs-sidebar-link-title {
+      display: block;
+      font-size: 0.94rem;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .labs-sidebar-link-desc {
+      display: block;
+      font-size: 0.77rem;
+      line-height: 1.35;
+      color: rgba(228, 232, 235, 0.76);
+    }
+
+    .labs-sidebar-link.active .labs-sidebar-link-desc {
+      color: rgba(255, 204, 51, 0.82);
+    }
+
+    .labs-sidebar-section {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(210, 215, 220, 0.18);
+    }
+
+    .labs-sidebar-section:first-of-type {
+      margin-top: 0;
+      padding-top: 0;
+      border-top: 0;
+    }
+
+    .labs-sidebar-links {
+      display: grid;
+      gap: 6px;
+    }
+
+    .labs-sidebar-action {
+      width: 100%;
+      border: 0;
+      border-radius: 10px;
+      background: transparent;
+      color: var(--platinum);
+      font: inherit;
+      text-align: left;
+      padding: 9px 12px;
+      cursor: pointer;
+      transition: background-color 0.15s ease, color 0.15s ease;
+      display: grid;
+      gap: 2px;
+      text-decoration: none;
+    }
+
+    .labs-sidebar-action:hover {
+      background: rgba(228, 232, 235, 0.12);
+    }
+
+    .labs-sidebar-action-title {
+      display: block;
+      font-size: 0.94rem;
+      font-weight: 700;
+      line-height: 1.2;
+      color: #0099cc;
+    }
+
+    .labs-sidebar-action-desc {
+      display: block;
+      font-size: 0.77rem;
+      line-height: 1.35;
+      color: rgba(255, 204, 51, 0.82);
+    }
+
+    .shell-content {
+      min-width: 0;
+      min-height: 0;
+      display: flex;
     }
 
     .app-frame {
@@ -295,6 +447,7 @@
       background: var(--platinum);
       border-radius: 0;
       display: block;
+      flex: 1 1 auto;
     }
 
     @media (max-width: 900px) {
@@ -312,17 +465,30 @@
         font-size: 1.3rem;
       }
 
-      .topbar-features {
-        gap: 10px;
-      }
-
       .shell-main {
         padding: 0;
         height: calc(100vh - 56px);
+        grid-template-columns: 1fr;
+        grid-template-rows: auto minmax(0, 1fr);
       }
 
-      .feature-link {
-        font-size: 0.74rem;
+      .topbar-menu-panel {
+        width: min(280px, calc(100vw - 24px));
+      }
+
+      .labs-sidebar {
+        padding: 16px 12px;
+        border-right: 0;
+        border-bottom: 1px solid rgba(77, 84, 91, 0.2);
+        overflow: visible;
+      }
+
+      .labs-sidebar-copy {
+        margin-bottom: 12px;
+      }
+
+      .labs-sidebar-nav {
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
       }
     }
   </style>
@@ -333,25 +499,11 @@
       <span class="app-title-prefix" aria-hidden="true">labs.</span>
       <img src="assets/svg/blizlab_logo_flat.svg" alt="Blizlab Labs">
     </h1>
-    <nav class="topbar-features" aria-label="Labs features">
-      <button class="feature-link" data-app-nav="octofind" type="button">Octofind</button>
-      <button class="feature-link" data-app-nav="checksy" type="button">Checksy</button>
-      <button class="feature-link" data-app-nav="chrono" type="button">Chrono</button>
-      <button class="feature-link" data-app-nav="corrector" type="button">Corrector</button>
-      <button class="feature-link" data-app-nav="calendar" type="button">Calendar</button>
-    </nav>
     <div class="topbar-menu-wrap">
-      <button class="topbar-menu-btn" id="topbarMenuButton" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="topbarMenuPanel" aria-label="Open more apps menu">
-        <img src="assets/svg/icons/menu_fill.svg" alt="" width="20" height="20" aria-hidden="true">
+      <button class="topbar-menu-btn" id="topbarMenuButton" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="topbarMenuPanel" aria-label="Open Labs menu">
+        <img src="assets/svg/icons/menu_fill.svg" alt="" width="24" height="24" aria-hidden="true">
       </button>
       <div class="topbar-menu-panel" id="topbarMenuPanel" role="menu" hidden>
-        <p class="menu-panel-title"><img class="menu-panel-title-icon" src="assets/svg/blizlab-bolt.svg" alt="" width="14" height="14" aria-hidden="true">More apps</p>
-        <ul class="menu-panel-links">
-          <li><a href="https://blizlab.com/" target="_blank" rel="noreferrer noopener">Blizlab - Multiplane image editor</a></li>
-          <li><a href="https://webprompter.app/" target="_blank" rel="noreferrer noopener">WebPrompter - Free online teleprompter</a></li>
-          <li><a href="https://pipdown.com/" target="_blank" rel="noreferrer noopener">Pipdown - Markdown notes companion</a></li>
-        </ul>
-        <hr class="menu-panel-divider">
         <div class="menu-panel-actions">
           <button class="menu-panel-action-btn" id="topbarClearCache" type="button">Clear cache</button>
         </div>
@@ -365,7 +517,54 @@
   </header>
 
   <main class="shell-main">
-    <iframe class="app-frame" id="appFrame" title="Blizlab Labs app content" loading="lazy"></iframe>
+    <aside class="labs-sidebar" aria-label="Labs apps">
+      <section class="labs-sidebar-section" aria-label="Top apps">
+        <p class="labs-sidebar-title">Top apps</p>
+        <div class="labs-sidebar-links">
+          <a class="labs-sidebar-action" href="https://blizlab.com/" target="_blank" rel="noreferrer noopener">
+            <span class="labs-sidebar-action-title">Blizlab</span>
+            <span class="labs-sidebar-action-desc">Multiplane image editor for layered visual work.</span>
+          </a>
+          <a class="labs-sidebar-action" href="https://webprompter.app/" target="_blank" rel="noreferrer noopener">
+            <span class="labs-sidebar-action-title">WebPrompter</span>
+            <span class="labs-sidebar-action-desc">Free browser teleprompter for scripts and recording.</span>
+          </a>
+          <a class="labs-sidebar-action" href="https://threadmk.com/" target="_blank" rel="noreferrer noopener">
+            <span class="labs-sidebar-action-title">ThreadMK</span>
+            <span class="labs-sidebar-action-desc">Compose and organize social threads more cleanly.</span>
+          </a>
+        </div>
+      </section>
+      <section class="labs-sidebar-section" aria-label="Utilities">
+        <p class="labs-sidebar-title">Utilities</p>
+        <p class="labs-sidebar-copy">Open a tool from the Labs collection.</p>
+        <nav class="labs-sidebar-nav">
+          <button class="labs-sidebar-link" data-app-nav="octofind" type="button">
+            <span class="labs-sidebar-link-title">Octofind</span>
+            <span class="labs-sidebar-link-desc">Search free media sites in one place.</span>
+          </button>
+          <button class="labs-sidebar-link" data-app-nav="checksy" type="button">
+            <span class="labs-sidebar-link-title">Checksy</span>
+            <span class="labs-sidebar-link-desc">Check creator handles across selected sites.</span>
+          </button>
+          <button class="labs-sidebar-link" data-app-nav="chrono" type="button">
+            <span class="labs-sidebar-link-title">Chrono</span>
+            <span class="labs-sidebar-link-desc">One-button stopwatch with pop-out timer.</span>
+          </button>
+          <button class="labs-sidebar-link" data-app-nav="corrector" type="button">
+            <span class="labs-sidebar-link-title">Corrector</span>
+            <span class="labs-sidebar-link-desc">Clean up text with EN or ES correction.</span>
+          </button>
+          <button class="labs-sidebar-link" data-app-nav="calendar" type="button">
+            <span class="labs-sidebar-link-title">Calendar</span>
+            <span class="labs-sidebar-link-desc">Generate a minimal monthly planner to print.</span>
+          </button>
+        </nav>
+      </section>
+    </aside>
+    <section class="shell-content">
+      <iframe class="app-frame" id="appFrame" title="Blizlab Labs app content" loading="lazy"></iframe>
+    </section>
   </main>
 
   <script>
@@ -434,6 +633,7 @@
     navButtons.forEach((button) => {
       button.addEventListener("click", () => {
         goToApp(button.dataset.appNav);
+        closeTopbarMenu();
       });
     });
 
