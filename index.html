@@ -92,6 +92,29 @@
       align-items: center;
     }
 
+    .labs-toolbar-toggle {
+      display: none;
+      border: 0;
+      background: transparent;
+      color: var(--yellow);
+      padding: 6px 8px;
+      font: inherit;
+      font-size: 0.82rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .labs-toolbar-toggle:hover {
+      color: var(--platinum);
+    }
+
+    .labs-toolbar-toggle:focus-visible {
+      outline: 2px solid var(--blue);
+      outline-offset: 2px;
+    }
+
     .topbar-menu-btn {
       width: 36px;
       height: 36px;
@@ -314,6 +337,10 @@
       overflow-y: auto;
     }
 
+    .labs-sidebar-content {
+      display: contents;
+    }
+
     .labs-sidebar-title {
       margin: 0 0 4px;
       font-size: 0.84rem;
@@ -477,10 +504,29 @@
       }
 
       .labs-sidebar {
-        padding: 16px 12px;
+        display: flex;
+        flex-direction: column;
+        padding: 0;
         border-right: 0;
         border-bottom: 1px solid rgba(77, 84, 91, 0.2);
         overflow: visible;
+      }
+
+      .labs-toolbar-toggle {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .labs-sidebar-content {
+        display: block;
+        max-height: min(62vh, 560px);
+        padding: 16px 12px;
+        overflow-y: auto;
+      }
+
+      .labs-sidebar.is-collapsed .labs-sidebar-content {
+        display: none;
       }
 
       .labs-sidebar-copy {
@@ -499,6 +545,9 @@
       <span class="app-title-prefix" aria-hidden="true">labs.</span>
       <img src="assets/svg/blizlab_logo_flat.svg" alt="Blizlab Labs">
     </h1>
+    <button class="labs-toolbar-toggle" id="labsSidebarToggle" type="button" aria-expanded="false" aria-controls="labsSidebarContent">
+      Apps
+    </button>
     <div class="topbar-menu-wrap">
       <button class="topbar-menu-btn" id="topbarMenuButton" type="button" aria-haspopup="true" aria-expanded="false" aria-controls="topbarMenuPanel" aria-label="Open Labs menu">
         <img src="assets/svg/icons/menu_fill.svg" alt="" width="24" height="24" aria-hidden="true">
@@ -518,49 +567,51 @@
 
   <main class="shell-main">
     <aside class="labs-sidebar" aria-label="Labs apps">
-      <section class="labs-sidebar-section" aria-label="Top apps">
-        <p class="labs-sidebar-title">Top apps</p>
-        <div class="labs-sidebar-links">
-          <a class="labs-sidebar-action" href="https://blizlab.com/" target="_blank" rel="noreferrer noopener">
-            <span class="labs-sidebar-action-title">Blizlab.com</span>
-            <span class="labs-sidebar-action-desc">Multiplane image editor for layered visual work.</span>
-          </a>
-          <a class="labs-sidebar-action" href="https://webprompter.app/" target="_blank" rel="noreferrer noopener">
-            <span class="labs-sidebar-action-title">WebPrompter.app</span>
-            <span class="labs-sidebar-action-desc">Free browser teleprompter for scripts and recording.</span>
-          </a>
-          <a class="labs-sidebar-action" href="https://threadmk.com/" target="_blank" rel="noreferrer noopener">
-            <span class="labs-sidebar-action-title">ThreadMK.com</span>
-            <span class="labs-sidebar-action-desc">Compose and organize social threads more cleanly.</span>
-          </a>
-        </div>
-      </section>
-      <section class="labs-sidebar-section" aria-label="Utilities">
-        <p class="labs-sidebar-title">Utilities</p>
-        <p class="labs-sidebar-copy">Open a tool from the Labs collection.</p>
-        <nav class="labs-sidebar-nav">
-          <button class="labs-sidebar-link" data-app-nav="octofind" type="button">
-            <span class="labs-sidebar-link-title">Multi-Search</span>
-            <span class="labs-sidebar-link-desc">Search free media sites in one place.</span>
-          </button>
-          <button class="labs-sidebar-link" data-app-nav="corrector" type="button">
-            <span class="labs-sidebar-link-title">Corrector</span>
-            <span class="labs-sidebar-link-desc">Convert Word to Markdown and prepare scrips.</span>
-          </button>
-          <button class="labs-sidebar-link" data-app-nav="calendar" type="button">
-            <span class="labs-sidebar-link-title">Planner Generator</span>
-            <span class="labs-sidebar-link-desc">Minimal monthly calendar planner to save in PDF and print.</span>
-          </button>
-          <button class="labs-sidebar-link" data-app-nav="checksy" type="button">
-            <span class="labs-sidebar-link-title">Username Checker</span>
-            <span class="labs-sidebar-link-desc">Check creator handles across selected sites.</span>
-          </button>
-          <button class="labs-sidebar-link" data-app-nav="chrono" type="button">
-            <span class="labs-sidebar-link-title">Chronometer</span>
-            <span class="labs-sidebar-link-desc">Verify your scripts and reading speed with a pop-out timer.</span>
-          </button>
-        </nav>
-      </section>
+      <div class="labs-sidebar-content" id="labsSidebarContent">
+        <section class="labs-sidebar-section" aria-label="Top apps">
+          <p class="labs-sidebar-title">Top apps</p>
+          <div class="labs-sidebar-links">
+            <a class="labs-sidebar-action" href="https://blizlab.com/" target="_blank" rel="noreferrer noopener">
+              <span class="labs-sidebar-action-title">Blizlab.com</span>
+              <span class="labs-sidebar-action-desc">Multiplane image editor for layered visual work.</span>
+            </a>
+            <a class="labs-sidebar-action" href="https://webprompter.app/" target="_blank" rel="noreferrer noopener">
+              <span class="labs-sidebar-action-title">WebPrompter.app</span>
+              <span class="labs-sidebar-action-desc">Free browser teleprompter for scripts and recording.</span>
+            </a>
+            <a class="labs-sidebar-action" href="https://threadmk.com/" target="_blank" rel="noreferrer noopener">
+              <span class="labs-sidebar-action-title">ThreadMK.com</span>
+              <span class="labs-sidebar-action-desc">Compose and organize social threads more cleanly.</span>
+            </a>
+          </div>
+        </section>
+        <section class="labs-sidebar-section" aria-label="Utilities">
+          <p class="labs-sidebar-title">Utilities</p>
+          <p class="labs-sidebar-copy">Open a tool from the Labs collection.</p>
+          <nav class="labs-sidebar-nav">
+            <button class="labs-sidebar-link" data-app-nav="octofind" type="button">
+              <span class="labs-sidebar-link-title">Multi-Search</span>
+              <span class="labs-sidebar-link-desc">Search free media sites in one place.</span>
+            </button>
+            <button class="labs-sidebar-link" data-app-nav="corrector" type="button">
+              <span class="labs-sidebar-link-title">Corrector</span>
+              <span class="labs-sidebar-link-desc">Convert Word to Markdown and prepare scrips.</span>
+            </button>
+            <button class="labs-sidebar-link" data-app-nav="calendar" type="button">
+              <span class="labs-sidebar-link-title">Planner Generator</span>
+              <span class="labs-sidebar-link-desc">Minimal monthly calendar planner to save in PDF and print.</span>
+            </button>
+            <button class="labs-sidebar-link" data-app-nav="checksy" type="button">
+              <span class="labs-sidebar-link-title">Username Checker</span>
+              <span class="labs-sidebar-link-desc">Check creator handles across selected sites.</span>
+            </button>
+            <button class="labs-sidebar-link" data-app-nav="chrono" type="button">
+              <span class="labs-sidebar-link-title">Chronometer</span>
+              <span class="labs-sidebar-link-desc">Verify your scripts and reading speed with a pop-out timer.</span>
+            </button>
+          </nav>
+        </section>
+      </div>
     </aside>
     <section class="shell-content">
       <iframe class="app-frame" id="appFrame" title="Blizlab Labs app content" loading="lazy"></iframe>
@@ -580,10 +631,23 @@
 
     const appFrame = document.getElementById("appFrame");
     const navButtons = Array.from(document.querySelectorAll("[data-app-nav]"));
+    const labsSidebar = document.querySelector(".labs-sidebar");
+    const labsSidebarToggle = document.getElementById("labsSidebarToggle");
     const topbarMenuButton = document.getElementById("topbarMenuButton");
     const topbarMenuPanel = document.getElementById("topbarMenuPanel");
     const topbarClearCache = document.getElementById("topbarClearCache");
     const LABS_CACHE_KEY_PREFIXES = ["octofind-", "checksy-", "chrono-", "blizlab_corrector_"];
+    const mobileSidebarQuery = window.matchMedia("(max-width: 900px)");
+
+    function setSidebarCollapsed(collapsed) {
+      labsSidebar.classList.toggle("is-collapsed", collapsed);
+      labsSidebarToggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      labsSidebarToggle.textContent = collapsed ? "Apps" : "Hide Apps";
+    }
+
+    function syncSidebarForViewport(event) {
+      setSidebarCollapsed(event.matches);
+    }
 
     function normalizeApp(value) {
       const key = (value || "").toLowerCase();
@@ -633,9 +697,16 @@
     navButtons.forEach((button) => {
       button.addEventListener("click", () => {
         goToApp(button.dataset.appNav);
+        if (mobileSidebarQuery.matches) setSidebarCollapsed(true);
         closeTopbarMenu();
       });
     });
+
+    labsSidebarToggle.addEventListener("click", () => {
+      setSidebarCollapsed(!labsSidebar.classList.contains("is-collapsed"));
+    });
+
+    mobileSidebarQuery.addEventListener("change", syncSidebarForViewport);
 
     function closeTopbarMenu() {
       topbarMenuPanel.hidden = true;
@@ -687,6 +758,7 @@
 
     window.addEventListener("hashchange", applyRouteFromHash);
 
+    syncSidebarForViewport(mobileSidebarQuery);
     applyRouteFromHash();
   </script>
 </body>

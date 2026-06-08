@@ -9,7 +9,10 @@ const langEnBtn = document.getElementById("langEn");
 const langEsBtn = document.getElementById("langEs");
 const clearBtn = document.getElementById("clear");
 const copyOutputBtn = document.getElementById("copyOutput");
+const toggleReadingBtn = document.getElementById("toggleReading");
 const saveMarkdownBtn = document.getElementById("saveMarkdown");
+const savePdfBtn = document.getElementById("savePdf");
+const readingView = document.getElementById("readingView");
 const openOptionsBtn = document.getElementById("openOptions");
 const ignoredModal = document.getElementById("ignoredModal");
 const ignoredList = document.getElementById("ignoredList");
@@ -63,9 +66,10 @@ const languageLabels = {
 const EMOJI_REGEX = /[\p{Extended_Pictographic}\p{Emoji_Presentation}\uFE0F]/gu;
 
 let currentLanguage = null;
-let readingSpeed = DEFAULT_READING_SPEED;
+let readingSpeed = loadReadingSpeed();
 let selectedLanguage = "en";
 let languageSetManually = false;
+let readingMode = false;
 
 function setPlaceholderByOS() {
   const platform = navigator.platform || "";
@@ -784,9 +788,13 @@ if (langEnBtn) {
 if (langEsBtn) {
   langEsBtn.addEventListener("click", () => applyLanguageSelection("es", { manual: true }));
 }
-runCorrectBtn.addEventListener("click", () => runCorrection(selectedLanguage));
+runCorrectBtn.addEventListener("click", () => {
+  setReadingMode(false);
+  runCorrection(selectedLanguage);
+});
 
 clearBtn.addEventListener("click", () => {
+  setReadingMode(false);
   input.textContent = "";
   changeCount.textContent = "0 changes";
   updateWordCount();
@@ -808,6 +816,10 @@ copyOutputBtn.addEventListener("click", async () => {
   }
 });
 
+toggleReadingBtn.addEventListener("click", () => {
+  setReadingMode(!readingMode);
+});
+
 saveMarkdownBtn.addEventListener("click", () => {
   const text = getCurrentText();
   if (!text.trim()) return;
@@ -824,9 +836,354 @@ saveMarkdownBtn.addEventListener("click", () => {
   URL.revokeObjectURL(url);
 });
 
+function getPdfInlineRuns(text, baseStyle = "normal") {
+  const runs = [];
+  const pattern = /(\*\*|__)(.+?)\1|(\*|_)(.+?)\3|`([^`]+)`|\[([^\]]+)\]\(([^)]+)\)/g;
+  let cursor = 0;
+  let match;
+
+  while ((match = pattern.exec(text)) !== null) {
+    if (match.index > cursor) {
+      runs.push({ text: text.slice(cursor, match.index), style: baseStyle });
+    }
+    if (match[2]) {
+      runs.push({ text: match[2], style: "bold" });
+    } else if (match[4]) {
+      runs.push({ text: match[4], style: "italic" });
+    } else if (match[5]) {
+      runs.push({ text: match[5], style: "code" });
+    } else if (match[6]) {
+      runs.push({ text: match[6], pdfText: `${match[6]} (${match[7]})`, href: match[7], style: "link" });
+    }
+    cursor = pattern.lastIndex;
+  }
+
+  if (cursor < text.length) {
+    runs.push({ text: text.slice(cursor), style: baseStyle });
+  }
+  return runs;
+}
+
+function getPlainInlineText(text) {
+  return getPdfInlineRuns(text).map(run => run.text).join("");
+}
+
+function parseMarkdownTableRow(line) {
+  return line
+    .trim()
+    .replace(/^\|/, "")
+    .replace(/\|$/, "")
+    .split("|")
+    .map(cell => cell.trim());
+}
+
+function isMarkdownTableSeparator(line) {
+  const cells = parseMarkdownTableRow(line);
+  return cells.length > 0 && cells.every(cell => /^:?-{3,}:?$/.test(cell));
+}
+
+function parseMarkdownBlocks(markdown) {
+  const blocks = [];
+  const lines = markdown.split(/\r?\n/);
+
+  for (let lineIndex = 0; lineIndex < lines.length; lineIndex += 1) {
+    const line = lines[lineIndex].trimEnd();
+
+    if (/^```/.test(line.trim())) {
+      const codeLines = [];
+      lineIndex += 1;
+      while (lineIndex < lines.length && !/^```/.test(lines[lineIndex].trim())) {
+        codeLines.push(lines[lineIndex]);
+        lineIndex += 1;
+      }
+      blocks.push({ type: "code", lines: codeLines });
+      continue;
+    }
+
+    if (!line.trim()) {
+      blocks.push({ type: "blank" });
+      continue;
+    }
+
+    if (line.includes("|") && lineIndex + 1 < lines.length && isMarkdownTableSeparator(lines[lineIndex + 1])) {
+      const rows = [parseMarkdownTableRow(line)];
+      lineIndex += 2;
+      while (lineIndex < lines.length && lines[lineIndex].includes("|") && lines[lineIndex].trim()) {
+        rows.push(parseMarkdownTableRow(lines[lineIndex]));
+        lineIndex += 1;
+      }
+      lineIndex -= 1;
+      blocks.push({ type: "table", rows });
+      continue;
+    }
+
+    const heading = line.match(/^(#{1,6})\s+(.+)$/);
+    if (heading) {
+      blocks.push({ type: "heading", level: heading[1].length, text: heading[2] });
+      continue;
+    }
+
+    if (/^([-*_])(?:\s*\1){2,}\s*$/.test(line.trim())) {
+      blocks.push({ type: "rule" });
+      continue;
+    }
+
+    const quote = line.match(/^>\s?(.*)$/);
+    if (quote) {
+      blocks.push({ type: "quote", text: quote[1] });
+      continue;
+    }
+
+    const listItem = line.match(/^(\s*)([-+*]|\d+[.)])\s+(.+)$/);
+    if (listItem) {
+      blocks.push({
+        type: "list",
+        indent: Math.min(3, Math.floor(listItem[1].length / 2)),
+        marker: /^\d/.test(listItem[2]) ? listItem[2] : "•",
+        text: listItem[3],
+      });
+      continue;
+    }
+
+    blocks.push({ type: "paragraph", text: line });
+  }
+
+  return blocks;
+}
+
+function renderInlineHtml(text, baseStyle = "normal") {
+  return getPdfInlineRuns(text, baseStyle).map(run => {
+    const safeText = escapeHtml(run.text);
+    if (run.style === "bold") return `<strong>${safeText}</strong>`;
+    if (run.style === "italic") return `<em>${safeText}</em>`;
+    if (run.style === "code") return `<code>${safeText}</code>`;
+    if (run.style === "link" && /^(https?:|mailto:)/i.test(run.href || "")) {
+      const safeHref = escapeHtml(run.href).replace(/"/g, "&quot;");
+      return `<a href="${safeHref}" target="_blank" rel="noreferrer noopener">${safeText}</a>`;
+    }
+    return safeText;
+  }).join("");
+}
+
+function setReadingMode(enabled) {
+  readingMode = enabled;
+  if (enabled) {
+    readingView.innerHTML = renderMarkdownToReadingHtml(getCurrentText());
+  }
+  input.hidden = enabled;
+  readingView.hidden = !enabled;
+  toggleReadingBtn.textContent = enabled ? "Edit" : "Read";
+  toggleReadingBtn.setAttribute("aria-pressed", String(enabled));
+  toggleReadingBtn.classList.toggle("active", enabled);
+}
+
+function renderMarkdownToReadingHtml(markdown) {
+  return parseMarkdownBlocks(markdown).map(block => {
+    if (block.type === "blank") return "";
+    if (block.type === "heading") return `<h${block.level}>${renderInlineHtml(block.text, "bold")}</h${block.level}>`;
+    if (block.type === "rule") return "<hr>";
+    if (block.type === "quote") return `<blockquote>${renderInlineHtml(block.text, "italic")}</blockquote>`;
+    if (block.type === "list") {
+      return `<div class="reading-list-item" style="--list-indent:${block.indent}"><span>${escapeHtml(block.marker)}</span><div>${renderInlineHtml(block.text)}</div></div>`;
+    }
+    if (block.type === "code") return `<pre><code>${escapeHtml(block.lines.join("\n"))}</code></pre>`;
+    if (block.type === "table") {
+      const [header, ...rows] = block.rows;
+      return `<div class="reading-table-wrap"><table><thead><tr>${header.map(cell => `<th>${renderInlineHtml(cell)}</th>`).join("")}</tr></thead><tbody>${rows.map(row => `<tr>${row.map(cell => `<td>${renderInlineHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+    }
+    return `<p>${renderInlineHtml(block.text)}</p>`;
+  }).join("");
+}
+
+function renderMarkdownToPdf(pdf, markdown) {
+  const margin = 54;
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const contentWidth = pageWidth - margin * 2;
+  const maxY = pageHeight - margin;
+  let y = margin;
+  function ensureSpace(height) {
+    if (y + height <= maxY) return;
+    pdf.addPage();
+    y = margin;
+  }
+
+  function setRunFont(style, size) {
+    if (style === "code") {
+      pdf.setFont("courier", "normal");
+      pdf.setTextColor(45, 55, 65);
+    } else {
+      pdf.setFont("helvetica", style === "link" ? "normal" : style);
+      pdf.setTextColor(style === "link" ? 0 : 36, style === "link" ? 122 : 41, style === "link" ? 163 : 45);
+    }
+    pdf.setFontSize(size);
+  }
+
+  function writeInline(text, options = {}) {
+    const xStart = options.x || margin;
+    const maxWidth = options.maxWidth || contentWidth;
+    const size = options.size || 11;
+    const lineHeight = options.lineHeight || Math.ceil(size * 1.4);
+    const baseStyle = options.style || "normal";
+    let x = xStart;
+
+    ensureSpace(lineHeight);
+    getPdfInlineRuns(text, baseStyle).forEach(run => {
+        const parts = (run.pdfText || run.text).split(/(\s+)/).filter(Boolean);
+      parts.forEach(part => {
+        setRunFont(run.style, size);
+        const width = pdf.getTextWidth(part);
+        if (!/^\s+$/.test(part) && x > xStart && x + width > xStart + maxWidth) {
+          y += lineHeight;
+          ensureSpace(lineHeight);
+          x = xStart;
+        }
+        if (x !== xStart || !/^\s+$/.test(part)) {
+          pdf.text(part, x, y);
+          x += width;
+        }
+      });
+    });
+    y += lineHeight;
+  }
+
+  function renderTable(rows) {
+    const columnCount = Math.max(...rows.map(row => row.length));
+    const cellWidth = contentWidth / columnCount;
+    const cellPadding = 5;
+    const lineHeight = 12;
+
+    rows.forEach((row, rowIndex) => {
+      const wrappedCells = Array.from({ length: columnCount }, (_, columnIndex) => {
+        const value = getPlainInlineText(row[columnIndex] || "");
+        pdf.setFont("helvetica", rowIndex === 0 ? "bold" : "normal");
+        pdf.setFontSize(9);
+        return pdf.splitTextToSize(value, cellWidth - cellPadding * 2);
+      });
+      const rowHeight = Math.max(...wrappedCells.map(lines => lines.length), 1) * lineHeight + cellPadding * 2;
+      ensureSpace(rowHeight);
+
+      wrappedCells.forEach((lines, columnIndex) => {
+        const x = margin + columnIndex * cellWidth;
+        if (rowIndex === 0) {
+          pdf.setFillColor(226, 232, 235);
+          pdf.rect(x, y, cellWidth, rowHeight, "F");
+        }
+        pdf.setDrawColor(160, 169, 176);
+        pdf.setLineWidth(0.6);
+        pdf.rect(x, y, cellWidth, rowHeight);
+        pdf.setFont("helvetica", rowIndex === 0 ? "bold" : "normal");
+        pdf.setFontSize(9);
+        pdf.setTextColor(36, 41, 45);
+        pdf.text(lines, x + cellPadding, y + cellPadding + 9, { lineHeightFactor: 1.25 });
+      });
+
+      y += rowHeight;
+    });
+    y += 10;
+  }
+
+  parseMarkdownBlocks(markdown).forEach(block => {
+    if (block.type === "blank") {
+      y += 8;
+      ensureSpace(1);
+      return;
+    }
+
+    if (block.type === "code") {
+      y += 5;
+      block.lines.forEach(line => {
+        ensureSpace(15);
+        pdf.setFillColor(242, 244, 246);
+        pdf.rect(margin - 6, y - 11, contentWidth + 12, 16, "F");
+        writeInline(line || " ", { size: 9, lineHeight: 16, style: "code" });
+      });
+      y += 8;
+      return;
+    }
+
+    if (block.type === "table") {
+      renderTable(block.rows);
+      return;
+    }
+
+    if (block.type === "heading") {
+      const level = block.level;
+      const sizes = [22, 18, 15, 13, 12, 11];
+      const size = sizes[level - 1];
+      y += level <= 2 ? 8 : 4;
+      writeInline(block.text, {
+        size,
+        lineHeight: Math.ceil(size * 1.35),
+        style: "bold",
+      });
+      return;
+    }
+
+    if (block.type === "rule") {
+      ensureSpace(16);
+      pdf.setDrawColor(190, 196, 201);
+      pdf.line(margin, y, pageWidth - margin, y);
+      y += 16;
+      return;
+    }
+
+    if (block.type === "quote") {
+      ensureSpace(18);
+      pdf.setDrawColor(0, 153, 204);
+      pdf.setLineWidth(2);
+      pdf.line(margin, y - 10, margin, y + 6);
+      writeInline(block.text, {
+        x: margin + 12,
+        maxWidth: contentWidth - 12,
+        style: "italic",
+      });
+      return;
+    }
+
+    if (block.type === "list") {
+      const indent = block.indent * 12;
+      ensureSpace(16);
+      setRunFont("bold", 11);
+      pdf.text(block.marker, margin + indent, y);
+      writeInline(block.text, {
+        x: margin + indent + 18,
+        maxWidth: contentWidth - indent - 18,
+      });
+      return;
+    }
+
+    writeInline(block.text);
+  });
+}
+
+savePdfBtn.addEventListener("click", () => {
+  const text = getCurrentText();
+  if (!text.trim()) return;
+  if (!window.jspdf) {
+    setStatus("PDF unavailable", false);
+    return;
+  }
+
+  const title = getTitleFromMarkdown(text);
+  const filename = title ? `${title}.pdf` : "corrected-text.pdf";
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF({
+    orientation: "portrait",
+    unit: "pt",
+    format: "letter",
+  });
+
+  renderMarkdownToPdf(pdf, text);
+  pdf.save(filename);
+  setStatus("PDF saved", true);
+  setTimeout(() => setStatus("Ready", false), 1200);
+});
+
 if (openOptionsBtn) {
   openOptionsBtn.addEventListener("click", openIgnoredModal);
 }
+
 closeIgnored.addEventListener("click", closeIgnoredModal);
 
 saveIgnored.addEventListener("click", () => {
@@ -848,7 +1205,14 @@ applyLanguageSelection("en");
 setPlaceholderByOS();
 updateRunButtonsState();
 
-readingSpeed = loadReadingSpeed();
+if ("serviceWorker" in navigator && window.isSecureContext) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("service-worker.js").catch(() => {
+      setStatus("Offline cache unavailable", false);
+    });
+  });
+}
+
 if (readingSpeedInput) {
   readingSpeedInput.value = readingSpeed;
   readingSpeedInput.addEventListener("change", () => {

@@ -32,46 +32,44 @@
 <body>
   <app-header layout="compact" app-title="Corrector"></app-header>
 
-  <main class="page-main">
-    <section class="app-shell corrector-shell">
-      <section class="app-search-card controls-card">
-        <div class="controls-row">
-          <div class="toolbar-buttons">
-            <button id="runCorrect" class="app-btn" type="button">
-              <img class="icon-img" src="/assets/svg/icons/check_2_fill.svg" alt="" width="14" height="14" aria-hidden="true">
-              <span>Correct</span>
-            </button>
-            <div class="lang-segment" role="group" aria-label="Correction language">
-              <button id="langEn" class="lang-segment-btn active" type="button" aria-pressed="true">EN</button>
-              <button id="langEs" class="lang-segment-btn" type="button" aria-pressed="false">ES</button>
-            </div>
-            <button id="clear" class="app-btn app-btn--ghost" type="button">Clear</button>
-            <button id="copyOutput" class="app-btn" type="button">Copy</button>
-            <button id="saveMarkdown" class="app-btn" type="button">Save</button>
-            <button id="openOptions" class="menu-icon-button" type="button" aria-label="Open options">
-              <img class="icon-img" src="/assets/svg/icons/menu_line.svg" alt="" width="16" height="16" aria-hidden="true">
-            </button>
-          </div>
-          <div class="status-light-wrap" aria-live="polite" aria-label="Corrector status">
-            <span id="status" class="status-text">Ready</span>
-            <span class="status-dot" id="statusDot" title="Status"></span>
-          </div>
+  <main class="page-main corrector-shell">
+    <section class="app-search-card controls-card">
+      <div class="controls-row">
+        <div class="toolbar-buttons">
+          <button id="runCorrect" class="app-btn" type="button">
+            <img class="icon-img" src="/assets/svg/icons/check_2_fill.svg" alt="" width="14" height="14" aria-hidden="true">
+            <span>Correct</span>
+          </button>
+          <button id="clear" class="app-btn app-btn--ghost" type="button">Clear</button>
+          <button id="copyOutput" class="app-btn" type="button">Copy</button>
+          <button id="toggleReading" class="app-btn app-btn--ghost" type="button" aria-pressed="false">Read</button>
+          <button id="saveMarkdown" class="app-btn" type="button">Save MD</button>
+          <button id="savePdf" class="app-btn" type="button">Save PDF</button>
         </div>
-        <div class="app-search-hint">Use EN/ES correction, then click any highlighted word to revert or restore all matches.</div>
-      </section>
-
-      <div class="stack">
-        <div id="input" class="editor-input" contenteditable="true" spellcheck="false" data-placeholder="Paste your text here..."></div>
-      </div>
-
-      <div class="app-footer-row meta">
-        <span id="wordCount">0 words</span>
-        <span id="readingTime">0 min read</span>
-        <span id="changeCount">0 changes</span>
-        <span id="languageLabel">Language: Manual</span>
-        <span>Red: changes. Orange: suspicious. Green: reverted.</span>
+        <div class="controls-row-right">
+          <button id="openOptions" class="menu-icon-button" type="button" aria-label="Open options">
+            <img class="icon-img" src="/assets/svg/icons/settings_3_fill.svg" alt="" width="16" height="16" aria-hidden="true">
+          </button>
+        </div>
       </div>
     </section>
+
+    <div class="stack">
+      <div id="input" class="editor-input" contenteditable="true" spellcheck="false" data-placeholder="Paste your text here..."></div>
+      <article id="readingView" class="reading-view" hidden></article>
+    </div>
+
+    <div class="app-footer-row meta">
+      <span id="wordCount">0 words</span>
+      <span id="readingTime">0 min read</span>
+      <span id="changeCount">0 changes</span>
+      <span id="languageLabel">Language: Manual</span>
+      <span>Red: changes. Orange: suspicious. Green: reverted.</span>
+      <div class="status-light-wrap" aria-live="polite" aria-label="Corrector status">
+        <span id="status" class="status-text">Ready</span>
+        <span class="status-dot" id="statusDot" title="Status"></span>
+      </div>
+    </div>
   </main>
 
   <div class="app-modal-backdrop" id="ignoredModal" aria-hidden="true">
@@ -81,11 +79,18 @@
         <button id="closeIgnored" class="app-btn app-btn--small" type="button">Close</button>
       </div>
       <div class="app-modal-body corrector-modal-body">
+        <div class="field">
+          <span>Correction language</span>
+          <div class="lang-segment" role="group" aria-label="Correction language">
+            <button id="langEn" class="lang-segment-btn active" type="button" aria-pressed="true">EN</button>
+            <button id="langEs" class="lang-segment-btn" type="button" aria-pressed="false">ES</button>
+          </div>
+        </div>
         <p>One word or phrase per line. These will be ignored in future corrections.</p>
         <textarea id="ignoredList" rows="6" placeholder="Ex: Loeb"></textarea>
         <label class="field">
           <span>Reading speed (words per minute)</span>
-          <input id="readingSpeed" type="number" min="100" max="250" step="5" />
+          <input id="readingSpeed" type="number" min="100" max="250" step="5" value="165" />
         </label>
       </div>
       <div class="app-modal-foot">
@@ -97,7 +102,8 @@
     </div>
   </div>
 
-  <script src="app.js" defer></script>
+  <script src="vendor/jspdf.umd.min.js"></script>
+  <script src="app.js?v=20260608-reading" defer></script>
   <app-footer></app-footer>
 </body>
 </html>
